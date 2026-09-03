@@ -285,7 +285,7 @@ body.locked-scroll{overflow:hidden}
     <button class="btn danger" onclick="logoutNexo()">Sair</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.5.1</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios</div></div></section>
+<div class="card"><b>NEXO 1.5.2</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -411,22 +411,29 @@ async function loginEmail(){
   try{authMessage('');await auth.signInWithEmailAndPassword(email,p)}catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
 }
 async function loginGoogle(){
-  try{authMessage('');const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await auth.signInWithRedirect(provider)}
-  catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
+  try{
+    authMessage('');
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    await auth.signInWithPopup(provider);
+  }catch(err){
+    console.error(err);
+    if(err && err.code==='auth/popup-blocked'){
+      authMessage('O navegador bloqueou a janela do Google. Permita pop-ups para este site e tente novamente.');
+      return;
+    }
+    if(err && err.code==='auth/popup-closed-by-user'){
+      authMessage('A janela do Google foi fechada antes de concluir o login.');
+      return;
+    }
+    authMessage(firebaseErrorMessage(err));
+  }
 }
 async function logoutNexo(){try{await auth.signOut()}catch(err){console.error(err);alert('Não foi possível sair agora. Tente novamente.')}}
 function goHotmart(){if(NEXO_HOTMART_URL.startsWith('http'))location.href=NEXO_HOTMART_URL;else alert('O checkout ainda não foi conectado. Cole o link da Hotmart em NEXO_HOTMART_URL.')}
-async function bootNexo(){
+function bootNexo(){
   document.body.classList.add('locked-scroll');
   setTimeout(()=>{$('splash').classList.add('hide');setTimeout(()=>{$('splash').style.display='none'},520)},2200);
-  // Finaliza o retorno do login Google sem depender de pop-up.
-  try{
-    await auth.getRedirectResult();
-  }catch(err){
-    console.error(err);
-    authMessage(firebaseErrorMessage(err));
-  }
-
   auth.onAuthStateChanged(async user=>{
     currentFirebaseUser=user||null;currentUserProfile=null;
     if(user){hideAuth();try{await checkAccess();if(typeof head==='function')head();if(typeof home==='function')home()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
