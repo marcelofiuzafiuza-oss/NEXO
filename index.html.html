@@ -1,0 +1,1018 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEXO 1.3</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#111827;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}.app{max-width:540px;margin:auto;padding-bottom:82px}header{padding:20px 16px 10px;display:flex;justify-content:space-between}.logo{font-size:25px;font-weight:900}.logo i{color:#16a34a;font-style:normal}.date{font-size:11px;color:#6b7280;text-align:right}.screen{display:none;padding:8px 16px}.active{display:block}.hero{background:#111827;color:#fff;border-radius:22px;padding:20px}.hero .small{color:#fff;opacity:.7}.big{font-size:32px;font-weight:900}.small,.sub,.muted{font-size:12px;color:#6b7280}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.metric,.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}.metric{padding:14px}.value{font-size:20px;font-weight:800;margin-top:4px}.card{padding:15px;margin:12px 0}.section{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 10px}.section h2{font-size:17px;margin:0}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.item{padding:13px 0;border-bottom:1px solid #e5e7eb}.item:last-child{border:0}.name{font-weight:800}.btn{border:0;border-radius:12px;padding:10px 13px;font-weight:750}.primary{background:#16a34a;color:#fff}.dark{background:#111827;color:#fff}.ghost{background:#f3f4f6}.danger{background:#fee2e2;color:#991b1b}.blue{background:#dbeafe;color:#1d4ed8}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.actions>*{flex:1}.badge{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:800}.green{background:#dcfce7;color:#166534}.orange{background:#fff7ed;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.progress{height:9px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:9px}.progress div{height:100%;background:#16a34a;width:0}.search,.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;outline:0}.empty{text-align:center;padding:24px;color:#6b7280;font-size:13px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);height:70px;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(5,1fr);z-index:5}.nav button{border:0;background:none;color:#6b7280;font-size:10px;font-weight:700}.nav button.active{color:#16a34a}.nav b{display:block;font-size:20px}.fab{position:fixed;right:18px;bottom:82px;width:54px;height:54px;border:0;border-radius:50%;background:#16a34a;color:#fff;font-size:27px;z-index:6}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:10}.modal.show{display:flex}.sheet{background:#fff;width:min(540px,100%);margin:auto;border-radius:24px 24px 0 0;padding:18px;max-height:90vh;overflow:auto}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:5px}hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}.notice{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;padding:13px;border-radius:15px;font-size:12px}@media print{.nav,.fab,header,.screen:not(#reports){display:none!important}#reports{display:block!important}.app{max-width:none;padding:0}.card,.metric{break-inside:avoid}}
+.fabmenu{position:fixed;right:18px;bottom:145px;z-index:7;display:none;flex-direction:column;gap:7px;align-items:flex-end}
+.fabmenu.show{display:flex}
+.fabmenu button{min-width:150px;border:0;border-radius:12px;padding:10px 13px;background:#fff;color:#111827;border:1px solid #e5e7eb;box-shadow:0 8px 24px #0002;text-align:left;font-weight:750}
+.fabmenu button:hover{background:#f9fafb}
+
+.chartbox{height:190px;position:relative;margin-top:10px}
+.chartbox canvas{width:100%;height:100%;display:block}
+.chartlegend{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.chartlegend .value{font-size:18px}
+
+.reportchart{height:205px;position:relative;margin-top:10px}
+.reportchart canvas{width:100%;height:100%;display:block}
+.ranknum{width:28px;height:28px;border-radius:9px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex:0 0 auto}
+.report-note{font-size:11px;color:#6b7280;line-height:1.45;margin-top:8px}
+
+/* NEXO abertura, autenticação e teste */
+body.locked-scroll{overflow:hidden}
+.splash{position:fixed;inset:0;background:#081018;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .5s ease,visibility .5s ease}
+.splash.hide{opacity:0;visibility:hidden}
+.splash-core{text-align:center;padding:24px}
+.splash-glow{width:110px;height:110px;margin:0 auto 24px;border-radius:50%;background:radial-gradient(circle,#16a34a 0%,#16a34a55 28%,transparent 70%);filter:blur(2px);animation:glowPulse 1.25s ease-in-out infinite alternate}
+@keyframes glowPulse{from{transform:scale(.78);opacity:.45}to{transform:scale(1.08);opacity:1}}
+.splash-word{font-size:52px;font-weight:950;letter-spacing:2px;color:#fff;line-height:1}
+.splash-word span{display:inline-block;opacity:0;transform:translateY(18px) scale(.78);animation:letterIn .38s cubic-bezier(.2,.8,.2,1) forwards}
+.splash-word span:nth-child(1){animation-delay:.35s}.splash-word span:nth-child(2){animation-delay:.58s}.splash-word span:nth-child(3){animation-delay:.81s}.splash-word span:nth-child(4){animation-delay:1.04s}
+.splash-word span:last-child{color:#16a34a}
+@keyframes letterIn{to{opacity:1;transform:translateY(0) scale(1)}}
+.splash-tag{margin-top:14px;color:#cbd5e1;font-size:14px;font-weight:700;opacity:0;animation:tagIn .45s ease forwards;animation-delay:1.42s}
+@keyframes tagIn{to{opacity:1}}
+.auth-wrap{position:fixed;inset:0;background:linear-gradient(180deg,#07111d,#111827);z-index:90;display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.auth-wrap.show{display:flex}
+.auth-card{width:min(440px,100%);background:#fff;border-radius:28px;padding:26px 20px 24px;box-shadow:0 30px 80px #0006}
+.auth-brand{text-align:center;margin-bottom:22px}
+.auth-mark{width:76px;height:76px;border-radius:22px;margin:0 auto 14px;display:grid;place-items:center;background:linear-gradient(135deg,#16a34a,#2563eb);color:#fff;font-size:34px;font-weight:950;box-shadow:0 16px 38px #16a34a33}
+.auth-logo{font-size:35px;font-weight:950;letter-spacing:.5px}.auth-logo i{font-style:normal;color:#16a34a}
+.auth-sub{font-size:13px;color:#6b7280;margin-top:4px}
+.google-btn{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:14px;padding:13px;font-weight:800;color:#111827}
+.auth-sep{display:flex;align-items:center;gap:10px;color:#9ca3af;font-size:12px;margin:17px 0}.auth-sep:before,.auth-sep:after{content:"";height:1px;background:#e5e7eb;flex:1}
+.auth-switch{text-align:center;margin-top:14px;font-size:12px;color:#6b7280}.auth-switch button{border:0;background:none;color:#2563eb;font-weight:800}
+.trial-banner{display:none;margin:0 16px 8px;background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:14px;padding:10px 12px;font-size:12px;font-weight:750}
+.trial-banner.show{display:block}
+.lock-screen{position:fixed;inset:0;background:linear-gradient(180deg,#07111d,#111827);z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
+.lock-screen.show{display:flex}
+.lock-card{width:min(430px,100%);background:#fff;border-radius:28px;padding:28px 22px;text-align:center}
+.lock-icon{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;background:#fee2e2;color:#991b1b;font-size:32px}
+.lock-card h2{margin:0 0 8px;font-size:24px}
+.lock-card p{color:#6b7280;font-size:13px;line-height:1.5}
+.purchase-btn{width:100%;margin-top:12px}
+.logout-link{border:0;background:none;color:#6b7280;font-weight:700;margin-top:10px}
+</style></head><body>
+<div class="splash" id="splash">
+  <div class="splash-core">
+    <div class="splash-glow"></div>
+    <div class="splash-word"><span>N</span><span>E</span><span>X</span><span>O</span></div>
+    <div class="splash-tag">Gestão para Barbeiros</div>
+  </div>
+</div>
+
+<div class="auth-wrap" id="authWrap">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-mark">N</div>
+      <div class="auth-logo">NEX<i>O</i></div>
+      <div class="auth-sub">Gestão para Barbeiros</div>
+    </div>
+
+    <div id="loginPane">
+      <button class="google-btn" onclick="loginGoogle()">G&nbsp;&nbsp; Entrar com Google</button>
+      <div class="auth-sep">ou com e-mail</div>
+      <div class="field"><label>E-mail</label><input id="loginEmail" type="email" placeholder="seuemail@exemplo.com"></div>
+      <div class="field"><label>Senha</label><input id="loginPass" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <button class="btn primary" style="width:100%;padding:14px" onclick="loginEmail()">Entrar</button>
+      <div class="auth-switch">Ainda não tem conta? <button onclick="toggleAuth('signup')">Criar conta nova</button></div>
+    </div>
+
+    <div id="signupPane" style="display:none">
+      <div class="field"><label>Nome</label><input id="signupName" type="text" placeholder="Seu nome"></div>
+      <div class="field"><label>E-mail</label><input id="signupEmail" type="email" placeholder="seuemail@exemplo.com"></div>
+      <div class="field"><label>Senha</label><input id="signupPass" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="field"><label>Confirmar senha</label><input id="signupPass2" type="password" placeholder="Repita sua senha"></div>
+      <button class="btn primary" style="width:100%;padding:14px" onclick="createAccount()">Criar conta</button>
+      <div class="auth-switch">Já tem conta? <button onclick="toggleAuth('login')">Fazer login</button></div>
+    </div>
+
+    <div class="sub" id="authMsg" style="text-align:center;margin-top:12px"></div>
+  </div>
+</div>
+
+<div class="lock-screen" id="trialLock">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>Seu período de teste terminou</h2>
+    <p>Os 7 dias gratuitos do NEXO chegaram ao fim. Para continuar usando sua agenda, financeiro, relatórios e demais recursos, escolha um plano.</p>
+    <button class="btn primary purchase-btn" onclick="goHotmart()">Ver planos e continuar</button>
+    <button class="logout-link" onclick="logoutNexo()">Sair da conta</button>
+  </div>
+</div>
+
+<div class="app"><header style="align-items:flex-start"><div><div class="logo" style="font-size:34px;line-height:1">NEX<i>O</i></div><div id="headerBiz" class="sub" style="margin-top:5px;font-weight:700;color:#374151"></div></div><div class="date" id="date"></div></header>
+<div class="trial-banner" id="trialBanner"></div>
+
+<section id="home" class="screen active"><div class="hero"><div class="small" id="biz"></div><div class="big" id="rev">R$ 0,00</div><div class="small">faturamento de hoje</div></div><div class="grid"><div class="metric"><div class="small">Receitas</div><div class="value" id="mIn">R$ 0,00</div></div><div class="metric"><div class="small">Despesas</div><div class="value" id="mOut">R$ 0,00</div></div><div class="metric"><div class="small">Resultado</div><div class="value" id="mResult">R$ 0,00</div></div><div class="metric"><div class="small">Atendimentos</div><div class="value" id="mDone">0</div></div></div><div class="card"><div class="row"><b>Meta diária</b><span id="goalPct" class="muted">0%</span></div><div class="progress"><div id="goalBar"></div></div><div class="sub" id="goalText" style="margin-top:7px"></div></div><div class="section"><h2>Minha Vida</h2><span class="muted">mês atual</span></div><div class="card"><div class="row"><div><div class="small">Contas pessoais</div><div class="value" id="lifeTotal">R$ 0,00</div></div><div style="text-align:right"><div class="small">Falta</div><div class="value" id="lifeLeft">R$ 0,00</div></div></div><div class="progress"><div id="lifeBar"></div></div><div class="sub" id="lifeNeed" style="margin-top:7px"></div></div><div class="section"><h2>Próximos atendimentos</h2></div><div class="card" id="nextList"></div></section>
+<section id="agenda" class="screen"><div class="section"><h2>Agenda</h2><div style="display:flex;gap:7px"><button class="btn ghost" onclick="newManualAppt()">+ Manual</button><button class="btn primary" onclick="newAppt()">+ Agendar</button></div></div><div class="card"><div class="field" style="margin:0"><label>Ver agendamentos de</label><input id="agendaPicker" type="date" onchange="agenda(this.value)"></div><div class="row" style="margin-top:10px"><b id="agendaDate"></b><span class="muted" id="agendaSummary"></span></div></div><div class="card" id="agendaList"></div></section>
+<section id="clients" class="screen"><div class="section"><h2>Clientes</h2><button class="btn primary" onclick="newClient()">+ Cliente</button></div><input class="search" id="search" placeholder="Buscar cliente..." oninput="renderClients()"><div class="card" id="clientList"></div></section>
+<section id="services" class="screen"><div class="section"><h2>Serviços</h2><button class="btn primary" onclick="newService()">+ Serviço</button></div><div class="card" id="serviceList"></div></section>
+<section id="finance" class="screen">
+<div class="section"><h2>Financeiro</h2><button class="btn primary" onclick="newTx()">+ Lançamento</button></div>
+
+<div class="card">
+  <div class="field" style="margin:0">
+    <label>Visualizar data</label>
+    <input id="financeDate" type="date" onchange="finance(this.value)">
+  </div>
+</div>
+
+<div class="grid">
+  <div class="metric"><div class="small">Receitas</div><div class="value" id="finIn">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Despesas</div><div class="value" id="finOut">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Resultado</div><div class="value" id="finRes">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Ticket médio</div><div class="value" id="finTicket">R$ 0,00</div></div>
+</div>
+
+<div class="section"><h2>Ticket médio semanal</h2><span class="muted" id="weekTicketLabel"></span></div>
+<div class="card">
+  <div class="chartlegend"><div><div class="small">Média da semana</div><div class="value" id="weekTicketAvg">R$ 0,00</div></div><span class="badge green">7 dias</span></div>
+  <div class="chartbox"><canvas id="weekTicketChart"></canvas></div>
+</div>
+
+<div class="section"><h2>Ticket médio mensal</h2><span class="muted" id="monthTicketLabel"></span></div>
+<div class="card">
+  <div class="chartlegend"><div><div class="small">Média do mês</div><div class="value" id="monthTicketAvg">R$ 0,00</div></div><span class="badge green">mês</span></div>
+  <div class="chartbox"><canvas id="monthTicketChart"></canvas></div>
+</div>
+
+<div class="section"><h2>Lançamentos do dia</h2><span class="muted" id="finDateLabel"></span></div>
+<div class="card" id="finList"></div>
+</section>
+<section id="life" class="screen">
+<div class="section"><h2>Minha Vida</h2><button class="btn primary" onclick="newBill()">+ Conta</button></div>
+<div class="notice">O NEXO calcula quanto você precisa faturar por dia para cobrir suas contas pessoais.</div>
+<div class="card">
+  <div class="field" style="margin:0">
+    <label>Visualizar mês</label>
+    <input id="lifeMonth" type="month" onchange="life(this.value)">
+  </div>
+</div>
+<div class="card">
+  <div class="grid">
+    <div><div class="small">Total</div><div class="value" id="lifeT">R$ 0,00</div></div>
+    <div><div class="small">Pago</div><div class="value" id="lifeP">R$ 0,00</div></div>
+    <div><div class="small">Falta</div><div class="value" id="lifeF">R$ 0,00</div></div>
+    <div><div class="small">Meta/dia</div><div class="value" id="lifeD">R$ 0,00</div></div>
+  </div>
+  <div class="progress"><div id="lifeProgress"></div></div>
+  <div class="sub" id="lifeDetail" style="margin-top:8px"></div>
+</div>
+<div class="section"><h2>Contas pessoais</h2><span class="muted" id="billCount"></span></div>
+<div class="card" id="billList"></div>
+</section>
+
+<section id="goals" class="screen">
+  <div class="section"><h2>Metas</h2><button class="btn primary" onclick="goalSettings()">Configurar</button></div>
+  <div class="grid">
+    <div class="metric"><div class="small">Meta diária</div><div class="value" id="gDaily">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Faturado hoje</div><div class="value" id="gToday">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Meta semanal</div><div class="value" id="gWeekly">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Faturado semana</div><div class="value" id="gWeekNow">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Meta mensal</div><div class="value" id="gMonthly">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Faturado mês</div><div class="value" id="gMonthNow">R$ 0,00</div></div>
+  </div>
+  <div class="card">
+    <div class="row"><b>Progresso diário</b><span class="muted" id="gDailyPct">0%</span></div>
+    <div class="progress"><div id="gDailyBar"></div></div>
+    <div class="sub" id="gDailyText" style="margin-top:7px"></div>
+    <hr>
+    <div class="row"><b>Progresso semanal</b><span class="muted" id="gWeeklyPct">0%</span></div>
+    <div class="progress"><div id="gWeeklyBar"></div></div>
+    <div class="sub" id="gWeeklyText" style="margin-top:7px"></div>
+    <hr>
+    <div class="row"><b>Progresso mensal</b><span class="muted" id="gMonthlyPct">0%</span></div>
+    <div class="progress"><div id="gMonthlyBar"></div></div>
+    <div class="sub" id="gMonthlyText" style="margin-top:7px"></div>
+  </div>
+</section>
+
+<section id="stock" class="screen">
+  <div class="section"><h2>Estoque</h2><button class="btn primary" onclick="newStock()">+ Produto</button></div>
+  <div class="grid">
+    <div class="metric"><div class="small">Produtos</div><div class="value" id="stockCount">0</div></div>
+    <div class="metric"><div class="small">Estoque baixo</div><div class="value" id="stockLow">0</div></div>
+    <div class="metric"><div class="small">Valor em estoque</div><div class="value" id="stockValue">R$ 0,00</div></div>
+    <div class="metric"><div class="small">Movimentações</div><div class="value" id="stockMovesCount">0</div></div>
+  </div>
+  <div class="card" id="stockList"></div>
+</section>
+
+<section id="reports" class="screen">
+<div class="section"><h2>Relatórios</h2><button class="btn dark" onclick="window.print()">Salvar PDF</button></div>
+
+<div class="card">
+  <div class="field" style="margin:0">
+    <label>Período principal da análise</label>
+    <select id="reportPeriod" onchange="reports()">
+      <option value="today">Hoje</option>
+      <option value="7">Últimos 7 dias</option>
+      <option value="month" selected>Mês atual</option>
+      <option value="year">Ano atual</option>
+    </select>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="metric"><div class="small">Receitas</div><div class="value" id="repIn">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Despesas</div><div class="value" id="repOut">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Resultado</div><div class="value" id="repResult">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Atendimentos</div><div class="value" id="repDone">0</div></div>
+  <div class="metric"><div class="small">Ticket médio</div><div class="value" id="repTicket">R$ 0,00</div></div>
+  <div class="metric"><div class="small">Margem</div><div class="value" id="repMargin">0%</div></div>
+  <div class="metric"><div class="small">Clientes únicos</div><div class="value" id="repUnique">0</div></div>
+  <div class="metric"><div class="small">Cancelamentos</div><div class="value" id="repCancel">0</div></div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div><div class="small">Faturamento médio/dia</div><div class="value" id="repDayAvg">R$ 0,00</div></div>
+    <div style="text-align:right"><div class="small">Melhor serviço</div><div class="name" id="repBestService">—</div></div>
+  </div>
+  <hr>
+  <div class="row">
+    <div><div class="small">Dia mais movimentado</div><div class="name" id="repBusyDay">—</div></div>
+    <div style="text-align:right"><div class="small">Horário mais forte</div><div class="name" id="repBusyHour">—</div></div>
+  </div>
+</div>
+
+<div class="section"><h2>Ticket médio por dia da semana</h2></div>
+<div class="card">
+  <div class="reportchart"><canvas id="repWeekdayTicketChart"></canvas></div>
+  <div class="report-note">Calculado somente com atendimentos concluídos dentro do período selecionado.</div>
+</div>
+
+<div class="section"><h2>Ticket médio por mês</h2></div>
+<div class="card">
+  <div class="reportchart"><canvas id="repMonthlyTicketChart"></canvas></div>
+  <div class="report-note">Janeiro a dezembro do ano atual, permitindo enxergar evolução de preço e mix de serviços.</div>
+</div>
+
+<div class="section"><h2>Faturamento por mês</h2></div>
+<div class="card">
+  <div class="reportchart"><canvas id="repMonthlyRevenueChart"></canvas></div>
+</div>
+
+<div class="section"><h2>Serviços mais realizados — últimos 7 dias</h2></div>
+<div class="card" id="repServicesWeek"></div>
+
+<div class="section"><h2>Serviços mais realizados — ano</h2></div>
+<div class="card" id="repServicesYear"></div>
+
+<div class="section"><h2>Serviços que mais faturaram</h2></div>
+<div class="card" id="repServiceRevenue"></div>
+
+<div class="section"><h2>Maiores despesas</h2></div>
+<div class="card" id="repBigExpenses"></div>
+
+<div class="section"><h2>Despesas por categoria</h2></div>
+<div class="card" id="repCats"></div>
+
+<div class="section"><h2>Produtos mais vendidos</h2></div>
+<div class="card" id="repProducts"></div>
+
+<div class="section"><h2>Clientes que mais geraram receita</h2></div>
+<div class="card" id="repTopClients"></div>
+
+<div class="section"><h2>Indicadores de comportamento</h2></div>
+<div class="card" id="repInsights"></div>
+</section>
+
+<section id="more" class="screen"><div class="section"><h2>Mais</h2></div><div class="card"><div class="row"><div><b>Financeiro</b><div class="sub">Receitas, despesas e resultado</div></div><button class="btn ghost" onclick="show('finance')">Abrir</button></div><hr><div class="row"><div><b>Minha Vida</b><div class="sub">Contas pessoais e necessidade diária</div></div><button class="btn ghost" onclick="show('life')">Abrir</button></div><hr><div class="row"><div><b>Metas</b><div class="sub">Metas diária, semanal e mensal</div></div><button class="btn ghost" onclick="show('goals')">Abrir</button></div><hr><div class="row"><div><b>Estoque</b><div class="sub">Produtos, entradas, saídas e alertas</div></div><button class="btn ghost" onclick="show('stock')">Abrir</button></div><hr><div class="row"><div><b>Relatórios</b><div class="sub">Resumo financeiro e desempenho</div></div><button class="btn ghost" onclick="show('reports')">Abrir</button></div><hr><div class="row"><div><b>Configurações</b><div class="sub">Negócio, metas e dias de trabalho</div></div><button class="btn dark" onclick="settings()">Configurar</button></div></div><div class="card">
+  <div class="row">
+    <div>
+      <b>Conta</b>
+      <div class="sub">Sair deste dispositivo e entrar com outra conta</div><div class="sub" id="accountEmail" style="margin-top:4px"></div>
+    </div>
+    <button class="btn danger" onclick="logoutNexo()">Sair</button>
+  </div>
+</div>
+<div class="card"><b>NEXO 1.5</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios</div></div></section>
+<div class="fabmenu" id="fabMenu">
+<button onclick="fabAction('in')">Receita</button>
+<button onclick="fabAction('out')">Despesa</button>
+<button onclick="fabAction('agenda')">Agendamento</button>
+<button onclick="fabAction('reports')">Relatório</button>
+<button onclick="fabAction('finance')">Financeiro</button>
+<button onclick="fabAction('life')">Pessoal</button>
+<button onclick="fabAction('stock')">Estoque</button>
+</div>
+<button class="fab" onclick="fab()">+</button><nav class="nav"><button class="active" onclick="show('home',this)"><b>⌂</b>Início</button><button onclick="show('agenda',this)"><b>◷</b>Agenda</button><button onclick="show('clients',this)"><b>♙</b>Clientes</button><button onclick="show('services',this)"><b>✂</b>Serviços</button><button onclick="show('more',this)"><b>☰</b>Mais</button></nav></div>
+<div class="modal" id="modal"><div class="sheet"><div id="body"></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script>
+/* ===== NEXO FIREBASE AUTH + TESTE 7 DIAS ===== */
+const NEXO_TRIAL_DAYS = 7;
+const NEXO_HOTMART_URL = 'COLE_AQUI_SEU_LINK_DA_HOTMART';
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD6sqjl4p4UAacaSach18PFxNHHlwkbC_0",
+  authDomain: "nexo-75ed8.firebaseapp.com",
+  projectId: "nexo-75ed8",
+  storageBucket: "nexo-75ed8.firebasestorage.app",
+  messagingSenderId: "872564058542",
+  appId: "1:872564058542:web:e9f9ed9540cdfa259e803f"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const firestore = firebase.firestore();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
+
+let currentFirebaseUser = null;
+let currentUserProfile = null;
+
+function showAuth(){document.body.classList.add('locked-scroll');$('authWrap').classList.add('show')}
+function hideAuth(){$('authWrap').classList.remove('show');document.body.classList.remove('locked-scroll')}
+function toggleAuth(mode){$('loginPane').style.display=mode==='login'?'block':'none';$('signupPane').style.display=mode==='signup'?'block':'none';$('authMsg').textContent=''}
+function authMessage(t,ok=false){$('authMsg').textContent=t||'';$('authMsg').style.color=ok?'#166534':'#991b1b'}
+function firebaseErrorMessage(err){
+  const code=err&&err.code?err.code:'';
+  const map={
+    'auth/invalid-email':'E-mail inválido.',
+    'auth/missing-password':'Digite sua senha.',
+    'auth/weak-password':'A senha precisa ter pelo menos 6 caracteres.',
+    'auth/email-already-in-use':'Já existe uma conta com este e-mail.',
+    'auth/invalid-credential':'E-mail ou senha inválidos.',
+    'auth/wrong-password':'E-mail ou senha inválidos.',
+    'auth/user-not-found':'E-mail ou senha inválidos.',
+    'auth/popup-closed-by-user':'A janela do Google foi fechada antes de concluir o login.',
+    'auth/popup-blocked':'O navegador bloqueou a janela do Google. Permita pop-ups para continuar.',
+    'auth/unauthorized-domain':'Este domínio ainda não está autorizado no Firebase Authentication.',
+    'auth/network-request-failed':'Falha de conexão. Verifique sua internet e tente novamente.'
+  };
+  return map[code]||('Não foi possível concluir: '+(err?.message||'erro desconhecido.'));
+}
+async function createUserProfileIfNeeded(user,nameHint=''){
+  const ref=firestore.collection('users').doc(user.uid);
+  const snap=await ref.get();
+  if(!snap.exists){
+    await ref.set({
+      uid:user.uid,
+      name:nameHint||user.displayName||'',
+      email:user.email||'',
+      photoURL:user.photoURL||'',
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      trialStart:firebase.firestore.FieldValue.serverTimestamp(),
+      subscriptionStatus:'trial',
+      plan:'trial'
+    });
+    const fresh=await ref.get();
+    return fresh.data()||{};
+  }
+  const data=snap.data()||{};
+  const safeUpdate={};
+  if(!data.name&&(nameHint||user.displayName))safeUpdate.name=nameHint||user.displayName;
+  if(!data.email&&user.email)safeUpdate.email=user.email;
+  if(!data.photoURL&&user.photoURL)safeUpdate.photoURL=user.photoURL;
+  if(Object.keys(safeUpdate).length)await ref.set(safeUpdate,{merge:true});
+  return {...data,...safeUpdate};
+}
+function profileTrialState(profile){
+  const status=String(profile?.subscriptionStatus||'trial').toLowerCase();
+  const paid=['active','paid','subscribed'].includes(status);
+  if(paid)return {paid:true,expired:false,daysLeft:null,status};
+  const ts=profile?.trialStart;
+  let startMs=null;
+  if(ts&&typeof ts.toMillis==='function')startMs=ts.toMillis();
+  else if(ts&&ts.seconds)startMs=ts.seconds*1000;
+  else if(typeof ts==='number')startMs=ts;
+  if(!startMs)return {paid:false,expired:false,daysLeft:NEXO_TRIAL_DAYS,status:'trial'};
+  const elapsed=(Date.now()-startMs)/86400000;
+  const daysLeft=Math.max(0,Math.ceil(NEXO_TRIAL_DAYS-elapsed));
+  return {paid:false,expired:elapsed>=NEXO_TRIAL_DAYS,daysLeft,status:'trial'};
+}
+async function checkAccess(){
+  if(!currentFirebaseUser){$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');showAuth();return}
+  try{
+    currentUserProfile=await createUserProfileIfNeeded(currentFirebaseUser);
+    if($('accountEmail'))$('accountEmail').textContent=currentFirebaseUser.email||'';
+    const t=profileTrialState(currentUserProfile);
+    $('trialBanner').classList.add('show');
+    if(t.paid)$('trialBanner').textContent='NEXO • Assinatura ativa';
+    else if(t.expired)$('trialBanner').textContent='Seu período de teste terminou.';
+    else $('trialBanner').textContent=`Você está no período de teste • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
+    if(t.expired&&!t.paid){$('trialLock').classList.add('show');document.body.classList.add('locked-scroll')}
+    else{$('trialLock').classList.remove('show');document.body.classList.remove('locked-scroll')}
+  }catch(err){console.error(err);authMessage('Não foi possível validar seu acesso no Firebase.');showAuth()}
+}
+async function createAccount(){
+  const name=$('signupName').value.trim(),email=$('signupEmail').value.trim().toLowerCase(),p=$('signupPass').value,p2=$('signupPass2').value;
+  if(!name||!email||p.length<6)return authMessage('Preencha nome, e-mail e uma senha com pelo menos 6 caracteres.');
+  if(p!==p2)return authMessage('As senhas não conferem.');
+  try{authMessage('');const cred=await auth.createUserWithEmailAndPassword(email,p);await cred.user.updateProfile({displayName:name});await createUserProfileIfNeeded(cred.user,name)}
+  catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
+}
+async function loginEmail(){
+  const email=$('loginEmail').value.trim().toLowerCase(),p=$('loginPass').value;
+  if(!email||!p)return authMessage('Digite seu e-mail e sua senha.');
+  try{authMessage('');await auth.signInWithEmailAndPassword(email,p)}catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
+}
+async function loginGoogle(){
+  try{authMessage('');const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await auth.signInWithPopup(provider)}
+  catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
+}
+async function logoutNexo(){try{await auth.signOut()}catch(err){console.error(err);alert('Não foi possível sair agora. Tente novamente.')}}
+function goHotmart(){if(NEXO_HOTMART_URL.startsWith('http'))location.href=NEXO_HOTMART_URL;else alert('O checkout ainda não foi conectado. Cole o link da Hotmart em NEXO_HOTMART_URL.')}
+function bootNexo(){
+  document.body.classList.add('locked-scroll');
+  setTimeout(()=>{$('splash').classList.add('hide');setTimeout(()=>{$('splash').style.display='none'},520)},2200);
+  auth.onAuthStateChanged(async user=>{
+    currentFirebaseUser=user||null;currentUserProfile=null;
+    if(user){hideAuth();try{await checkAccess();if(typeof head==='function')head();if(typeof home==='function')home()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
+    else{$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');toggleAuth('login');showAuth()}
+  });
+}
+window.addEventListener('load',bootNexo);
+
+const K='NEXO13',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>new Date().toISOString().slice(0,10),$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+db.settings=db.settings||{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22};db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.tx=db.tx||[];db.bills=db.bills||[];db.stock=db.stock||[];db.stockMoves=db.stockMoves||[];localStorage.setItem(K,JSON.stringify(db));const save=()=>localStorage.setItem(K,JSON.stringify(db)),dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
+function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function close(){$('modal').classList.remove('show')}
+function show(id,b){closeFab();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}if(id==='home')home();if(id==='agenda')agenda();if(id==='clients')renderClients();if(id==='services')renderServices();if(id==='finance')finance();if(id==='life')life($('lifeMonth')?.value||currentMonth());if(id==='goals')goals();if(id==='stock')stock();if(id==='reports')reports()}
+function head(){$('date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});$('biz').textContent=db.settings.business;if($('headerBiz'))$('headerBiz').textContent=db.settings.business;if($('agendaPicker')&&!$('agendaPicker').value)$('agendaPicker').value=T();$('agendaDate').textContent='Hoje • '+dbr(T())}
+function home(){head();let a=db.appointments.filter(x=>x.date===T()),done=a.filter(x=>x.status==='completed'),r=done.reduce((s,x)=>s+ +x.value,0),ins=db.tx.filter(x=>x.date===T()&&x.type==='in').reduce((s,x)=>s+ +x.amount,0),outs=db.tx.filter(x=>x.date===T()&&x.type==='out').reduce((s,x)=>s+ +x.amount,0),g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
+function newClient(){open(`<h3>Novo cliente</h3>${f('Nome','cn')}${f('Telefone','cp','tel')}<div class="field"><label>Observação</label><textarea id="co" rows="3"></textarea></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addClient()">Salvar</button></div>`)}
+function addClient(){let n=$('cn').value.trim();if(!n)return alert('Informe o nome.');db.clients.push({id:uid(),name:n,phone:$('cp').value.trim(),note:$('co').value.trim(),visits:0,total:0,last:''});save();close();renderClients()}
+function renderClients(){let q=($('search')?.value||'').toLowerCase(),a=db.clients.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));$('clientList').innerHTML=a.length?a.map(c=>`<div class="item"><div class="row"><div><div class="name">${E(c.name)}</div><div class="sub">${E(c.phone||'Sem telefone')}</div></div><b>${c.visits}x</b></div><div class="sub">Total: ${M(c.total)}</div><div class="actions"><button class="btn ghost" onclick="hist('${c.id}')">Histórico</button><button class="btn blue" onclick="editClient('${c.id}')">Editar</button><button class="btn danger" onclick="delClient('${c.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum cliente encontrado.</div>'}
+function hist(id){let c=db.clients.find(x=>x.id===id),h=db.appointments.filter(x=>x.clientId===id&&x.status==='completed');open(`<h3>${E(c.name)}</h3><div class="card"><div class="row"><span>Atendimentos</span><b>${c.visits}</b></div><div class="row"><span>Total gasto</span><b>${M(c.total)}</b></div></div>${h.length?h.map(a=>`<div class="item"><div class="row"><div><b>${dbr(a.date)} • ${a.time}</b><div class="sub">${E(a.service)}</div></div><b>${M(a.value)}</b></div></div>`).join(''):'<div class="empty">Sem histórico.</div>'}<button class="btn ghost" onclick="close()">Fechar</button>`)}
+function editClient(id){let c=db.clients.find(x=>x.id===id);open(`<h3>Editar cliente</h3>${f('Nome','en','text',c.name)}${f('Telefone','ep','tel',c.phone)}<div class="field"><label>Observação</label><textarea id="eo" rows="3">${E(c.note)}</textarea></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="updateClient('${id}')">Salvar</button></div>`)}
+function updateClient(id){let c=db.clients.find(x=>x.id===id);c.name=$('en').value.trim();c.phone=$('ep').value.trim();c.note=$('eo').value.trim();save();close();renderClients();home()}function delClient(id){let c=db.clients.find(x=>x.id===id);if(confirm('Excluir '+c.name+'?')){db.clients=db.clients.filter(x=>x.id!==id);save();renderClients()}}
+function newService(){open(`<h3>Novo serviço</h3>${f('Nome','sn')}${f('Preço','sp','number','','step="0.01" min="0"')}${f('Duração','sd','number','30','min="1"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addService()">Salvar</button></div>`)}
+function addService(){let n=$('sn').value.trim(),p=+$('sp').value,d=+$('sd').value;if(!n||p<0||d<=0)return alert('Preencha os dados.');db.services.push({id:uid(),name:n,price:p,duration:d});save();close();renderServices()}function renderServices(){$('serviceList').innerHTML=db.services.length?db.services.map(s=>`<div class="item"><div class="row"><div><div class="name">${E(s.name)}</div><div class="sub">${s.duration} minutos</div></div><b>${M(s.price)}</b></div><div class="actions"><button class="btn blue" onclick="editService('${s.id}')">Editar</button><button class="btn danger" onclick="delService('${s.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Cadastre seus serviços.</div>'}
+function editService(id){let s=db.services.find(x=>x.id===id);open(`<h3>Editar serviço</h3>${f('Nome','un','text',s.name)}${f('Preço','up','number',s.price,'step="0.01" min="0"')}${f('Duração','ud','number',s.duration,'min="1"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="updateService('${id}')">Salvar</button></div>`)}function updateService(id){let s=db.services.find(x=>x.id===id);s.name=$('un').value.trim();s.price=+$('up').value;s.duration=+$('ud').value;save();close();renderServices()}function delService(id){let s=db.services.find(x=>x.id===id);if(confirm('Excluir '+s.name+'?')){db.services=db.services.filter(x=>x.id!==id);save();renderServices()}}
+function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente primeiro.');if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Novo atendimento</h3><div class="field"><label>Cliente</label><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div><div class="field"><label>Serviço</label><select id="as" onchange="sync()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','ad','date',$('agendaPicker')?.value||T())}${f('Horário','at','time','09:00')}${f('Valor','av','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addAppt()">Agendar</button></div>`)}function sync(){let s=db.services.find(x=>x.id===$('as').value);$('av').value=s.price}function addAppt(){let c=db.clients.find(x=>x.id===$('ac').value),s=db.services.find(x=>x.id===$('as').value);db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('at').value,service:s.name,value:+$('av').value,date:$('ad').value,status:'scheduled'});save();close();agenda($('ad')?.value||$('agendaPicker')?.value||T());home()}
+function newManualAppt(){if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Agendamento manual</h3>${f('Nome do cliente','mac')}${f('Telefone','map','tel')}<div class="field"><label>Serviço</label><select id="mas" onchange="syncManual()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','mad','date',$('agendaPicker')?.value||T())}${f('Horário','mat','time','09:00')}${f('Valor','mav','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addManualAppt()">Agendar</button></div>`)}
+function syncManual(){let s=db.services.find(x=>x.id===$('mas').value);if(s)$('mav').value=s.price}
+function addManualAppt(){let name=$('mac').value.trim(),phone=$('map').value.trim();if(!name)return alert('Informe o nome do cliente.');let s=db.services.find(x=>x.id===$('mas').value);if(!s)return alert('Selecione um serviço.');let existing=db.clients.find(c=>c.name.trim().toLowerCase()===name.toLowerCase()&&(!phone||!c.phone||c.phone===phone));let c=existing;if(!c){c={id:uid(),name,phone,note:'Cliente criado automaticamente por agendamento manual',visits:0,total:0,last:''};db.clients.push(c)}else if(phone&&!c.phone){c.phone=phone}let d=$('mad').value;db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('mat').value,service:s.name,value:+$('mav').value,date:d,status:'scheduled'});save();close();agenda(d);renderClients();home()}
+function agenda(sel){head();let date=sel||$('agendaPicker')?.value||T();if($('agendaPicker'))$('agendaPicker').value=date;let a=db.appointments.filter(x=>x.date===date).sort((x,y)=>x.time.localeCompare(y.time));let isToday=date===T();$('agendaDate').textContent=(isToday?'Hoje':'Data')+' • '+dbr(date);$('agendaSummary').textContent=a.filter(x=>x.status==='completed').length+' concluídos';$('agendaList').innerHTML=a.length?a.map(x=>`<div class="item"><div class="row"><b>${x.time}</b><div style="flex:1"><div class="name">${E(x.client)}</div><div class="sub">${E(x.service)} • ${M(x.value)}</div></div><span class="badge ${x.status==='completed'?'green':x.status==='cancelled'?'red':'orange'}">${x.status==='completed'?'Concluído':x.status==='cancelled'?'Cancelado':'Agendado'}</span></div>${x.status==='scheduled'?`<div class="actions"><button class="btn primary" onclick="finish('${x.id}')">Concluir</button><button class="btn danger" onclick="cancelA('${x.id}')">Cancelar</button></div>`:''}</div>`).join(''):'<div class="empty">Nenhum atendimento nesta data.</div>'}
+function finish(id){let a=db.appointments.find(x=>x.id===id);if(a.status!=='scheduled')return;a.status='completed';db.tx.push({id:uid(),type:'in',amount:+a.value,desc:'Atendimento: '+a.service,date:a.date});let c=db.clients.find(x=>x.id===a.clientId);if(c){c.visits++;c.total+=+a.value;c.last=a.date}save();agenda($('agendaPicker')?.value||a.date);home()}function cancelA(id){if(confirm('Cancelar este atendimento?')){db.appointments.find(x=>x.id===id).status='cancelled';save();agenda($('agendaPicker')?.value||T());home()}}
+function newTx(){open(`<h3>Novo lançamento</h3><div class="field"><label>Tipo</label><select id="tt"><option value="in">Receita</option><option value="out">Despesa</option></select></div>${f('Descrição','td')}${f('Valor','tv','number','','step="0.01" min="0.01"')}${f('Data','tdate','date',T())}<div class="field"><label>Categoria</label><select id="tc"><option>Atendimento</option><option>Produtos</option><option>Aluguel</option><option>Energia</option><option>Internet</option><option>Marketing</option><option>Transporte</option><option>Outros</option></select></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addTx()">Salvar</button></div>`)}function newTxType(type){newTx();setTimeout(()=>{if($('tt'))$('tt').value=type},0)}function addTx(){let v=+$('tv').value;if(!$('td').value.trim()||v<=0)return alert('Preencha os dados.');db.tx.push({id:uid(),type:$('tt').value,amount:v,desc:$('td').value.trim(),date:$('tdate').value,cat:$('tc').value});save();close();finance($('financeDate')?.value||$('tdate')?.value||T());home()}
+function finance(sel){
+  let date=sel||$('financeDate')?.value||T();
+  if($('financeDate'))$('financeDate').value=date;
+  let dayTx=db.tx.filter(x=>x.date===date),
+      ins=dayTx.filter(x=>x.type==='in'),
+      outs=dayTx.filter(x=>x.type==='out'),
+      iv=ins.reduce((s,x)=>s+ +x.amount,0),
+      ov=outs.reduce((s,x)=>s+ +x.amount,0),
+      a=db.appointments.filter(x=>x.status==='completed'&&x.date===date),
+      ticket=a.length?a.reduce((s,x)=>s+ +x.value,0)/a.length:0;
+
+  $('finIn').textContent=M(iv);
+  $('finOut').textContent=M(ov);
+  $('finRes').textContent=M(iv-ov);
+  $('finTicket').textContent=M(ticket);
+  $('finDateLabel').textContent=dbr(date);
+
+  let list=dayTx.slice().sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id));
+  $('finList').innerHTML=list.length?list.map(x=>`<div class="item"><div class="row"><div><b>${E(x.desc)}</b><div class="sub">${dbr(x.date)} • ${E(x.cat||'Outros')}</div></div><b>${x.type==='in'?'+':'−'} ${M(x.amount)}</b></div><div class="actions"><button class="btn danger" onclick="delTx('${x.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum lançamento nesta data.</div>';
+
+  renderTicketCharts(date);
+}
+function ticketForDate(date){
+  let a=db.appointments.filter(x=>x.status==='completed'&&x.date===date);
+  return a.length?a.reduce((s,x)=>s+ +x.value,0)/a.length:0;
+}
+function isoLocal(d){let y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function renderTicketCharts(baseDate){
+  let base=new Date(baseDate+'T12:00:00');
+
+  // Weekly: Monday to Sunday, one point per day
+  let dow=base.getDay()||7, start=new Date(base);start.setDate(base.getDate()-dow+1);
+  let week=[], weekVals=[];
+  for(let i=0;i<7;i++){
+    let d=new Date(start);d.setDate(start.getDate()+i);
+    let iso=isoLocal(d), val=ticketForDate(iso);
+    week.push({label:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'][i],value:val});
+    if(val>0)weekVals.push(val);
+  }
+  let weekAvg=weekVals.length?weekVals.reduce((s,v)=>s+v,0)/weekVals.length:0;
+  $('weekTicketAvg').textContent=M(weekAvg);
+  $('weekTicketLabel').textContent=dbr(isoLocal(start))+' a '+dbr(isoLocal(new Date(start.getFullYear(),start.getMonth(),start.getDate()+6)));
+  drawModernLine('weekTicketChart',week);
+
+  // Monthly: weekly buckets (1-7, 8-14, 15-21, 22-end)
+  let y=base.getFullYear(),mo=base.getMonth(),last=new Date(y,mo+1,0).getDate();
+  let buckets=[[1,7],[8,14],[15,21],[22,last]], month=[], allMonthVals=[];
+  buckets.forEach((r,i)=>{
+    let vals=[];
+    for(let day=r[0];day<=r[1]&&day<=last;day++){
+      let iso=isoLocal(new Date(y,mo,day)),v=ticketForDate(iso);
+      if(v>0){vals.push(v);allMonthVals.push(v)}
+    }
+    month.push({label:'Sem '+(i+1),value:vals.length?vals.reduce((s,v)=>s+v,0)/vals.length:0});
+  });
+  let monthAvg=allMonthVals.length?allMonthVals.reduce((s,v)=>s+v,0)/allMonthVals.length:0;
+  $('monthTicketAvg').textContent=M(monthAvg);
+  $('monthTicketLabel').textContent=base.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  drawModernLine('monthTicketChart',month);
+}
+function drawModernLine(id,data){
+  let canvas=$(id);if(!canvas)return;
+  let rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,rect.width*dpr);canvas.height=Math.max(1,rect.height*dpr);
+  let c=canvas.getContext('2d');c.scale(dpr,dpr);
+  let w=rect.width,h=rect.height,pad={l:8,r:8,t:14,b:28},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  c.clearRect(0,0,w,h);
+  let vals=data.map(x=>+x.value||0),max=Math.max(...vals,1),min=0;
+  let xs=data.map((_,i)=>pad.l+(data.length===1?cw/2:(cw*i/(data.length-1))));
+  let ys=vals.map(v=>pad.t+ch-(v-min)/(max-min||1)*ch);
+
+  c.strokeStyle='#e5e7eb';c.lineWidth=1;
+  for(let i=0;i<3;i++){let yy=pad.t+(ch*i/2);c.beginPath();c.moveTo(pad.l,yy);c.lineTo(w-pad.r,yy);c.stroke()}
+
+  let grad=c.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,'rgba(22,163,74,.22)');grad.addColorStop(1,'rgba(22,163,74,0)');
+  c.beginPath();c.moveTo(xs[0],pad.t+ch);
+  xs.forEach((x,i)=>c.lineTo(x,ys[i]));c.lineTo(xs[xs.length-1],pad.t+ch);c.closePath();c.fillStyle=grad;c.fill();
+
+  c.beginPath();xs.forEach((x,i)=>{if(i===0)c.moveTo(x,ys[i]);else{let px=xs[i-1],py=ys[i-1],mx=(px+x)/2;c.bezierCurveTo(mx,py,mx,ys[i],x,ys[i])}});
+  c.strokeStyle='#16a34a';c.lineWidth=3;c.lineCap='round';c.lineJoin='round';c.stroke();
+
+  xs.forEach((x,i)=>{c.beginPath();c.arc(x,ys[i],4,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.strokeStyle='#16a34a';c.lineWidth=2;c.stroke()});
+
+  c.fillStyle='#6b7280';c.font='11px system-ui';c.textAlign='center';
+  data.forEach((x,i)=>c.fillText(x.label,xs[i],h-8));
+}
+function delTx(id){if(confirm('Excluir lançamento?')){db.tx=db.tx.filter(x=>x.id!==id);save();finance($('financeDate')?.value||T());home()}}
+
+function currentMonth(){return T().slice(0,7)}
+function billMonth(b){return b.month||String(b.due||'').slice(0,7)||currentMonth()}
+function addMonthsISO(dateStr,months){
+  let d=new Date(dateStr+'T12:00:00');
+  let originalDay=d.getDate();
+  let y=d.getFullYear(),m=d.getMonth()+months;
+  let first=new Date(y,m,1,12,0,0);
+  let lastDay=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
+  first.setDate(Math.min(originalDay,lastDay));
+  return isoLocal(first);
+}
+function newBill(){
+  let month=$('lifeMonth')?.value||currentMonth();
+  open(`<h3>Nova conta pessoal</h3>
+  ${f('Conta','bn')}
+  ${f('Valor da parcela','bv','number','','step="0.01" min="0.01"')}
+  ${f('Vencimento da primeira parcela','bd','date',month+'-01')}
+  ${f('Quantidade de parcelas','bp','number','1','min="1" step="1"')}
+  <div class="sub" style="margin-top:8px">O padrão é 1 parcela. Se informar mais, o NEXO cria as próximas automaticamente, uma por mês.</div>
+  <div class="actions">
+    <button class="btn ghost" onclick="close()">Cancelar</button>
+    <button class="btn primary" onclick="addBill()">Salvar</button>
+  </div>`)
+}
+function addBill(){
+  let n=$('bn').value.trim(),v=+$('bv').value,due=$('bd').value,parts=Math.max(1,parseInt($('bp').value||'1',10));
+  if(!n||v<=0||!due)return alert('Preencha os dados.');
+  let groupId=uid();
+  for(let i=0;i<parts;i++){
+    let pdue=addMonthsISO(due,i);
+    db.bills.push({
+      id:uid(),groupId,name:n,amount:v,due:pdue,month:pdue.slice(0,7),
+      installment:i+1,installments:parts,paid:false
+    });
+  }
+  save();
+  close();
+  life(due.slice(0,7));
+  home();
+}
+function toggleBill(id){
+  let b=db.bills.find(x=>x.id===id);
+  if(!b)return;
+  b.paid=!b.paid;
+  save();
+  life($('lifeMonth')?.value||billMonth(b));
+  home();
+}
+function delBill(id){
+  let b=db.bills.find(x=>x.id===id);
+  if(!b)return;
+  if((b.installments||1)>1){
+    open(`<h3>Excluir conta</h3>
+    <div class="card">
+      <div class="name">${E(b.name)}</div>
+      <div class="sub">Parcela ${b.installment||1} de ${b.installments||1}</div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn danger" onclick="deleteOneBill('${id}')">Só esta</button>
+      <button class="btn danger" onclick="deleteBillGroup('${b.groupId}')">Todas</button>
+    </div>`);
+  }else if(confirm('Excluir esta conta?')){
+    db.bills=db.bills.filter(x=>x.id!==id);
+    save();
+    life($('lifeMonth')?.value||currentMonth());
+    home();
+  }
+}
+function deleteOneBill(id){
+  db.bills=db.bills.filter(x=>x.id!==id);
+  save();close();life($('lifeMonth')?.value||currentMonth());home();
+}
+function deleteBillGroup(groupId){
+  db.bills=db.bills.filter(x=>x.groupId!==groupId);
+  save();close();life($('lifeMonth')?.value||currentMonth());home();
+}
+function life(sel){
+  let month=sel||$('lifeMonth')?.value||currentMonth();
+  if($('lifeMonth'))$('lifeMonth').value=month;
+
+  let bills=db.bills.filter(b=>billMonth(b)===month);
+  let total=bills.reduce((s,b)=>s+ +b.amount,0);
+  let paid=bills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0);
+  let left=Math.max(0,total-paid);
+  let days=+db.settings.workdays||22;
+  let need=left/days;
+  let pct=total?paid/total*100:0;
+
+  $('lifeT').textContent=M(total);
+  $('lifeP').textContent=M(paid);
+  $('lifeF').textContent=M(left);
+  $('lifeD').textContent=M(need);
+  $('lifeProgress').style.width=pct+'%';
+
+  let d=new Date(month+'-01T12:00:00');
+  $('lifeDetail').textContent=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'})+' • '+days+' dias de trabalho • precisa gerar '+M(need)+' por dia.';
+  $('billCount').textContent=bills.length+' contas';
+
+  $('billList').innerHTML=bills.length
+    ? bills.slice().sort((a,b)=>String(a.due).localeCompare(String(b.due))).map(b=>`
+      <div class="item">
+        <div class="row">
+          <div>
+            <div class="name">${E(b.name)}</div>
+            <div class="sub">Vencimento: ${dbr(b.due)}${(b.installments||1)>1?' • Parcela '+b.installment+' de '+b.installments:''}</div>
+          </div>
+          <div style="text-align:right">
+            <b>${M(b.amount)}</b><br>
+            <span class="badge ${b.paid?'green':'orange'}">${b.paid?'Paga':'Pendente'}</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn ${b.paid?'ghost':'primary'}" onclick="toggleBill('${b.id}')">${b.paid?'Marcar pendente':'Marcar como paga'}</button>
+          <button class="btn danger" onclick="delBill('${b.id}')">Excluir</button>
+        </div>
+      </div>`).join('')
+    : '<div class="empty">Nenhuma conta neste mês.</div>';
+}
+
+
+function startOfWeekISO(base=T()){
+  let d=new Date(base+'T12:00:00'),day=d.getDay()||7;
+  d.setDate(d.getDate()-day+1);
+  return isoLocal(d)
+}
+function goals(){
+  let today=T(),weekStart=startOfWeekISO(today),now=new Date(today+'T12:00:00');
+  let monthStart=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+
+  let completed=db.appointments.filter(x=>x.status==='completed');
+  let todayRev=completed.filter(x=>x.date===today).reduce((s,x)=>s+(+x.value||0),0);
+  let weekRev=completed.filter(x=>x.date>=weekStart&&x.date<=today).reduce((s,x)=>s+(+x.value||0),0);
+  let monthRev=completed.filter(x=>x.date>=monthStart&&x.date<=today).reduce((s,x)=>s+(+x.value||0),0);
+
+  let gd=+db.settings.goal||0,gw=+db.settings.weeklyGoal||0,gm=+db.settings.monthlyGoal||0;
+
+  $('gDaily').textContent=M(gd); $('gToday').textContent=M(todayRev);
+  $('gWeekly').textContent=M(gw); $('gWeekNow').textContent=M(weekRev);
+  $('gMonthly').textContent=M(gm); $('gMonthNow').textContent=M(monthRev);
+
+  setGoalProgress('gDailyBar','gDailyPct','gDailyText',todayRev,gd);
+  setGoalProgress('gWeeklyBar','gWeeklyPct','gWeeklyText',weekRev,gw);
+  setGoalProgress('gMonthlyBar','gMonthlyPct','gMonthlyText',monthRev,gm);
+}
+function setGoalProgress(barId,pctId,textId,value,goal){
+  let pct=goal?Math.min(100,value/goal*100):0;
+  $(barId).style.width=pct+'%';
+  $(pctId).textContent=Math.round(pct)+'%';
+  $(textId).textContent=goal
+    ? `${M(value)} de ${M(goal)} • ${value>=goal?'meta atingida':'faltam '+M(goal-value)}`
+    : 'Defina uma meta para acompanhar o progresso.';
+}
+function goalSettings(){
+  open(`<h3>Configurar metas</h3>
+    ${f('Meta diária','ggd','number',db.settings.goal,'step="0.01" min="0"')}
+    ${f('Meta semanal','ggw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}
+    ${f('Meta mensal','ggm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}
+    <div class="actions">
+      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn primary" onclick="saveGoals()">Salvar</button>
+    </div>`)
+}
+function saveGoals(){
+  db.settings.goal=+$('ggd').value||0;
+  db.settings.weeklyGoal=+$('ggw').value||0;
+  db.settings.monthlyGoal=+$('ggm').value||0;
+  save();close();goals();home();
+}
+
+function stock(){
+  db.stock=db.stock||[]; db.stockMoves=db.stockMoves||[];
+  $('stockCount').textContent=db.stock.length;
+  let low=db.stock.filter(p=>(+p.qty||0)<=(+p.min||0));
+  $('stockLow').textContent=low.length;
+  $('stockValue').textContent=M(db.stock.reduce((s,p)=>s+(+p.qty||0)*(+p.cost||0),0));
+  $('stockMovesCount').textContent=db.stockMoves.length;
+
+  $('stockList').innerHTML=db.stock.length?db.stock
+    .slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'pt-BR'))
+    .map(p=>{
+      let isLow=(+p.qty||0)<=(+p.min||0);
+      return `<div class="item">
+        <div class="row">
+          <div>
+            <div class="name">${E(p.name)}</div>
+            <div class="sub">${E(p.category||'Sem categoria')} • mínimo ${Number(p.min||0).toLocaleString('pt-BR')}</div>
+          </div>
+          <div style="text-align:right">
+            <b>${Number(p.qty||0).toLocaleString('pt-BR')} un.</b><br>
+            <span class="badge ${isLow?'red':'green'}">${isLow?'Estoque baixo':'OK'}</span>
+          </div>
+        </div>
+        <div class="sub" style="margin-top:7px">Custo: ${M(p.cost)} • Venda: ${M(p.price)} • Valor em estoque: ${M((+p.qty||0)*(+p.cost||0))}</div>
+        <div class="actions">
+          <button class="btn blue" onclick="stockMove('${p.id}','in')">Entrada</button>
+          <button class="btn ghost" onclick="stockMove('${p.id}','out')">Saída</button>
+          <button class="btn ghost" onclick="editStock('${p.id}')">Editar</button>
+          <button class="btn danger" onclick="deleteStock('${p.id}')">Excluir</button>
+        </div>
+      </div>`
+    }).join('')
+    : '<div class="empty">Nenhum produto cadastrado.</div>';
+}
+function newStock(){
+  open(`<h3>Novo produto</h3>
+    ${f('Produto','spn')}
+    ${f('Categoria','spc')}
+    ${f('Quantidade atual','spq','number','0','min="0" step="1"')}
+    ${f('Estoque mínimo','spm','number','0','min="0" step="1"')}
+    ${f('Custo unitário','spcost','number','0','min="0" step="0.01"')}
+    ${f('Preço de venda','spprice','number','0','min="0" step="0.01"')}
+    <div class="actions">
+      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn primary" onclick="saveNewStock()">Salvar</button>
+    </div>`)
+}
+function saveNewStock(){
+  let name=$('spn').value.trim();
+  if(!name)return alert('Informe o nome do produto.');
+  let qty=Math.max(0,+$('spq').value||0);
+  let p={id:uid(),name,category:$('spc').value.trim(),qty,min:Math.max(0,+$('spm').value||0),cost:Math.max(0,+$('spcost').value||0),price:Math.max(0,+$('spprice').value||0)};
+  db.stock.push(p);
+  if(qty>0)db.stockMoves.push({id:uid(),stockId:p.id,type:'in',qty,date:T(),note:'Estoque inicial'});
+  save();close();stock();
+}
+function editStock(id){
+  let p=db.stock.find(x=>x.id===id); if(!p)return;
+  open(`<h3>Editar produto</h3>
+    ${f('Produto','spn','text',p.name)}
+    ${f('Categoria','spc','text',p.category||'')}
+    ${f('Quantidade atual','spq','number',p.qty,'min="0" step="1"')}
+    ${f('Estoque mínimo','spm','number',p.min,'min="0" step="1"')}
+    ${f('Custo unitário','spcost','number',p.cost,'min="0" step="0.01"')}
+    ${f('Preço de venda','spprice','number',p.price,'min="0" step="0.01"')}
+    <div class="actions">
+      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn primary" onclick="saveEditStock('${id}')">Salvar</button>
+    </div>`)
+}
+function saveEditStock(id){
+  let p=db.stock.find(x=>x.id===id); if(!p)return;
+  let oldQty=+p.qty||0,newQty=Math.max(0,+$('spq').value||0);
+  p.name=$('spn').value.trim()||p.name;p.category=$('spc').value.trim();
+  p.qty=newQty;p.min=Math.max(0,+$('spm').value||0);p.cost=Math.max(0,+$('spcost').value||0);p.price=Math.max(0,+$('spprice').value||0);
+  if(newQty!==oldQty)db.stockMoves.push({id:uid(),stockId:p.id,type:newQty>oldQty?'in':'out',qty:Math.abs(newQty-oldQty),date:T(),note:'Ajuste manual'});
+  save();close();stock();
+}
+function stockMove(id,type){
+  let p=db.stock.find(x=>x.id===id);if(!p)return;
+  open(`<h3>${type==='in'?'Entrada':'Saída'} de estoque</h3>
+    <div class="card"><div class="name">${E(p.name)}</div><div class="sub">Estoque atual: ${Number(p.qty||0).toLocaleString('pt-BR')} un.</div></div>
+    ${f('Quantidade','smq','number','1','min="1" step="1"')}
+    ${f('Observação','smn')}
+    ${type==='in'?`<div class="field"><label><input id="smexpense" type="checkbox"> Registrar custo desta entrada como despesa</label></div>`:''}
+    <div class="actions">
+      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn primary" onclick="saveStockMove('${id}','${type}')">Confirmar</button>
+    </div>`)
+}
+function saveStockMove(id,type){
+  let p=db.stock.find(x=>x.id===id),qty=Math.max(1,parseInt($('smq').value||'1',10));
+  if(!p)return;
+  if(type==='out'&&qty>(+p.qty||0))return alert('A saída não pode ser maior que o estoque atual.');
+  p.qty=(+p.qty||0)+(type==='in'?qty:-qty);
+  db.stockMoves.push({id:uid(),stockId:id,type,qty,date:T(),note:$('smn').value.trim()});
+  if(type==='in'&&$('smexpense')?.checked&&(+p.cost||0)>0){
+    db.tx.push({id:uid(),type:'out',amount:qty*(+p.cost||0),desc:'Compra de estoque: '+p.name,date:T(),cat:'Estoque'});
+  }
+  save();close();stock();home();
+}
+function deleteStock(id){
+  let p=db.stock.find(x=>x.id===id);if(!p)return;
+  if(!confirm('Excluir '+p.name+' do estoque?'))return;
+  db.stock=db.stock.filter(x=>x.id!==id);
+  save();stock();
+}
+
+function reportDateRange(period){
+  let now=new Date(),start,end=new Date();
+  end.setHours(23,59,59,999);
+  if(period==='today'){start=new Date(T()+'T00:00:00')}
+  else if(period==='7'){start=new Date();start.setDate(start.getDate()-6);start.setHours(0,0,0,0)}
+  else if(period==='year'){start=new Date(now.getFullYear(),0,1)}
+  else{start=new Date(now.getFullYear(),now.getMonth(),1)}
+  return {start,end}
+}
+function inReportRange(date,start,end){
+  if(!date)return false;
+  let d=new Date(date+'T12:00:00');
+  return d>=start&&d<=end;
+}
+function aggregateCount(items,keyFn){
+  let out={};items.forEach(x=>{let k=keyFn(x)||'Outros';out[k]=(out[k]||0)+1});return out
+}
+function aggregateSum(items,keyFn,valFn){
+  let out={};items.forEach(x=>{let k=keyFn(x)||'Outros';out[k]=(out[k]||0)+(+valFn(x)||0)});return out
+}
+function rankList(entries,formatter,empty='Sem dados suficientes.'){
+  return entries.length?entries.map(([name,val],i)=>`<div class="item"><div class="row"><div style="display:flex;align-items:center;gap:9px"><div class="ranknum">${i+1}</div><div><div class="name">${E(name)}</div></div></div><b>${formatter(val)}</b></div></div>`).join(''):`<div class="empty">${empty}</div>`
+}
+function reports(){
+  let period=$('reportPeriod')?.value||'month';
+  let {start,end}=reportDateRange(period);
+  let tx=db.tx.filter(x=>inReportRange(x.date,start,end));
+  let ins=tx.filter(x=>x.type==='in'),outs=tx.filter(x=>x.type==='out');
+  let iv=ins.reduce((s,x)=>s+ +x.amount,0),ov=outs.reduce((s,x)=>s+ +x.amount,0);
+  let appts=db.appointments.filter(x=>inReportRange(x.date,start,end));
+  let done=appts.filter(x=>x.status==='completed');
+  let cancelled=appts.filter(x=>x.status==='cancelled');
+  let ticket=done.length?done.reduce((s,x)=>s+ +x.value,0)/done.length:0;
+  let margin=iv?((iv-ov)/iv*100):0;
+
+  let uniqueClients=new Set(done.map(x=>x.clientId||x.client).filter(Boolean)).size;
+  let activeDays=new Set(done.map(x=>x.date)).size;
+  let dayAvg=activeDays?done.reduce((s,x)=>s+ +x.value,0)/activeDays:0;
+
+  $('repIn').textContent=M(iv);
+  $('repOut').textContent=M(ov);
+  $('repResult').textContent=M(iv-ov);
+  $('repDone').textContent=done.length;
+  $('repTicket').textContent=M(ticket);
+  $('repMargin').textContent=(isFinite(margin)?margin:0).toFixed(1)+'%';
+  $('repUnique').textContent=uniqueClients;
+  $('repCancel').textContent=cancelled.length;
+  $('repDayAvg').textContent=M(dayAvg);
+
+  let servCount=Object.entries(aggregateCount(done,x=>x.service)).sort((a,b)=>b[1]-a[1]);
+  $('repBestService').textContent=servCount[0]?.[0]||'—';
+
+  let wdNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let dayCount={};done.forEach(x=>{let k=wdNames[new Date(x.date+'T12:00:00').getDay()];dayCount[k]=(dayCount[k]||0)+1});
+  let busyDay=Object.entries(dayCount).sort((a,b)=>b[1]-a[1])[0];
+  $('repBusyDay').textContent=busyDay?busyDay[0]+' • '+busyDay[1]+' atend.':'—';
+
+  let hourCount={};done.forEach(x=>{let h=(x.time||'').slice(0,2);if(h)hourCount[h]=(hourCount[h]||0)+1});
+  let busyHour=Object.entries(hourCount).sort((a,b)=>b[1]-a[1])[0];
+  $('repBusyHour').textContent=busyHour?busyHour[0]+'h • '+busyHour[1]+' atend.':'—';
+
+  // Ticket by weekday in selected period
+  let weekdayData=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map((label,i)=>{
+    let jsDay=i===6?0:i+1;
+    let a=done.filter(x=>new Date(x.date+'T12:00:00').getDay()===jsDay);
+    return {label,value:a.length?a.reduce((s,x)=>s+ +x.value,0)/a.length:0}
+  });
+  drawReportBar('repWeekdayTicketChart',weekdayData,'currency');
+
+  // Current year ticket + revenue by month
+  let yr=new Date().getFullYear(),months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  let monthTicket=months.map((label,i)=>{
+    let a=db.appointments.filter(x=>x.status==='completed'&&x.date&&new Date(x.date+'T12:00:00').getFullYear()===yr&&new Date(x.date+'T12:00:00').getMonth()===i);
+    return {label,value:a.length?a.reduce((s,x)=>s+ +x.value,0)/a.length:0}
+  });
+  let monthRevenue=months.map((label,i)=>{
+    let a=db.appointments.filter(x=>x.status==='completed'&&x.date&&new Date(x.date+'T12:00:00').getFullYear()===yr&&new Date(x.date+'T12:00:00').getMonth()===i);
+    return {label,value:a.reduce((s,x)=>s+ +x.value,0)}
+  });
+  drawReportLine('repMonthlyTicketChart',monthTicket);
+  drawReportBar('repMonthlyRevenueChart',monthRevenue,'currency');
+
+  // Services last 7 days
+  let sevenStart=new Date();sevenStart.setDate(sevenStart.getDate()-6);sevenStart.setHours(0,0,0,0);
+  let sevenDone=db.appointments.filter(x=>x.status==='completed'&&inReportRange(x.date,sevenStart,end));
+  let weekServ=Object.entries(aggregateCount(sevenDone,x=>x.service)).sort((a,b)=>b[1]-a[1]);
+  $('repServicesWeek').innerHTML=rankList(weekServ,v=>v+'x','Nenhum serviço concluído nos últimos 7 dias.');
+
+  // Services current year
+  let yearStart=new Date(yr,0,1);
+  let yearDone=db.appointments.filter(x=>x.status==='completed'&&inReportRange(x.date,yearStart,end));
+  let yearServ=Object.entries(aggregateCount(yearDone,x=>x.service)).sort((a,b)=>b[1]-a[1]);
+  $('repServicesYear').innerHTML=rankList(yearServ,v=>v+'x','Nenhum serviço concluído neste ano.');
+
+  // Service revenue in selected period
+  let serviceRevenue=Object.entries(aggregateSum(done,x=>x.service,x=>x.value)).sort((a,b)=>b[1]-a[1]);
+  $('repServiceRevenue').innerHTML=rankList(serviceRevenue,v=>M(v),'Sem faturamento de serviços no período.');
+
+  // Largest individual expenses
+  let bigExp=outs.slice().sort((a,b)=>+b.amount-+a.amount).slice(0,10);
+  $('repBigExpenses').innerHTML=bigExp.length?bigExp.map((x,i)=>`<div class="item"><div class="row"><div style="display:flex;align-items:center;gap:9px"><div class="ranknum">${i+1}</div><div><div class="name">${E(x.desc||'Despesa')}</div><div class="sub">${dbr(x.date)} • ${E(x.cat||'Outros')}</div></div></div><b>${M(x.amount)}</b></div></div>`).join(''):'<div class="empty">Nenhuma despesa no período.</div>';
+
+  // Expense categories
+  let cats=Object.entries(aggregateSum(outs,x=>x.cat||'Outros',x=>x.amount)).sort((a,b)=>b[1]-a[1]);
+  $('repCats').innerHTML=rankList(cats,v=>M(v),'Nenhuma despesa no período.');
+
+  // Products sold = stock output movements, ranked by quantity
+  let moves=(db.stockMoves||[]).filter(x=>x.type==='out'&&inReportRange(x.date,start,end));
+  let productQty={};
+  moves.forEach(m=>{let p=(db.stock||[]).find(x=>x.id===m.stockId);let n=p?.name||'Produto removido';productQty[n]=(productQty[n]||0)+(+m.qty||0)});
+  let products=Object.entries(productQty).sort((a,b)=>b[1]-a[1]);
+  $('repProducts').innerHTML=rankList(products,v=>(Number(v)||0).toLocaleString('pt-BR')+' un.','Nenhuma saída de produto registrada no período.');
+
+  // Top clients by appointment revenue
+  let clientRev={};done.forEach(x=>{let n=x.client||'Cliente';clientRev[n]=(clientRev[n]||0)+(+x.value||0)});
+  let topClients=Object.entries(clientRev).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  $('repTopClients').innerHTML=rankList(topClients,v=>M(v),'Nenhum atendimento concluído no período.');
+
+  // Extra actionable insights
+  let repeatMap={};done.forEach(x=>{let k=x.clientId||x.client;if(k)repeatMap[k]=(repeatMap[k]||0)+1});
+  let repeatClients=Object.values(repeatMap).filter(v=>v>1).length;
+  let repeatRate=uniqueClients?repeatClients/uniqueClients*100:0;
+  let cancelRate=appts.length?cancelled.length/appts.length*100:0;
+  let expenseRate=iv?ov/iv*100:0;
+  let mostProfitable=serviceRevenue[0];
+  let lowStock=(db.stock||[]).filter(x=>+x.qty<=+x.min).length;
+
+  $('repInsights').innerHTML=`
+    <div class="item"><div class="row"><span>Taxa de cancelamento</span><b>${cancelRate.toFixed(1)}%</b></div><div class="sub">Cancelamentos ÷ todos os agendamentos do período.</div></div>
+    <div class="item"><div class="row"><span>Clientes recorrentes</span><b>${repeatRate.toFixed(1)}%</b></div><div class="sub">Clientes com mais de um atendimento concluído no período.</div></div>
+    <div class="item"><div class="row"><span>Despesas sobre receitas</span><b>${expenseRate.toFixed(1)}%</b></div><div class="sub">Quanto das entradas foi consumido pelas despesas.</div></div>
+    <div class="item"><div class="row"><span>Serviço com maior receita</span><b>${mostProfitable?E(mostProfitable[0]):'—'}</b></div><div class="sub">${mostProfitable?M(mostProfitable[1]):'Sem dados no período.'}</div></div>
+    <div class="item"><div class="row"><span>Produtos com estoque baixo</span><b>${lowStock}</b></div><div class="sub">Itens na quantidade mínima ou abaixo dela.</div></div>
+  `;
+}
+function drawReportBar(id,data,kind='number'){
+  let canvas=$(id);if(!canvas)return;
+  let rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,h=rect.height;
+  if(w<20){setTimeout(()=>drawReportBar(id,data,kind),30);return}
+  canvas.width=Math.max(1,w*dpr);canvas.height=Math.max(1,h*dpr);
+  let c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+  let pad={l:8,r:8,t:34,b:30},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  let vals=data.map(x=>+x.value||0),max=Math.max(...vals,1);
+  c.strokeStyle='#e5e7eb';c.lineWidth=1;
+  for(let i=0;i<3;i++){let y=pad.t+ch*i/2;c.beginPath();c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke()}
+  let gap=data.length>8?4:7,bw=Math.max(4,(cw-gap*(data.length-1))/Math.max(1,data.length));
+  data.forEach((x,i)=>{
+    let val=+x.value||0,bh=val/max*ch,xx=pad.l+i*(bw+gap),yy=pad.t+ch-bh;
+    let grad=c.createLinearGradient(0,yy,0,pad.t+ch);grad.addColorStop(0,'rgba(22,163,74,.95)');grad.addColorStop(1,'rgba(22,163,74,.45)');
+    c.fillStyle=grad;c.beginPath();
+    if(c.roundRect){let r=Math.min(6,bw/2);c.roundRect(xx,yy,bw,Math.max(1,bh),[r,r,0,0])}
+    else{c.rect(xx,yy,bw,Math.max(1,bh))}
+    c.fill();
+
+    c.fillStyle='#111827';c.font=data.length>8?'bold 8px system-ui':'bold 10px system-ui';c.textAlign='center';
+    let txt=kind==='currency'?(val?('R$ '+val.toLocaleString('pt-BR',{maximumFractionDigits:0})):'R$ 0'):val.toLocaleString('pt-BR',{maximumFractionDigits:1});
+    c.fillText(txt,xx+bw/2,Math.max(10,yy-6));
+
+    c.fillStyle='#6b7280';c.font=data.length>8?'9px system-ui':'10px system-ui';
+    c.fillText(x.label,xx+bw/2,h-9);
+  });
+}
+function drawReportLine(id,data){
+  let canvas=$(id);if(!canvas)return;
+  let rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,h=rect.height;
+  if(w<20){setTimeout(()=>drawReportLine(id,data),30);return}
+  canvas.width=Math.max(1,w*dpr);canvas.height=Math.max(1,h*dpr);
+  let c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+  let pad={l:8,r:8,t:38,b:30},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b,vals=data.map(x=>+x.value||0),max=Math.max(...vals,1);
+  let xs=data.map((_,i)=>pad.l+(data.length===1?cw/2:cw*i/(data.length-1))),ys=vals.map(v=>pad.t+ch-v/max*ch);
+  c.strokeStyle='#e5e7eb';c.lineWidth=1;
+  for(let i=0;i<3;i++){let y=pad.t+ch*i/2;c.beginPath();c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke()}
+  let grad=c.createLinearGradient(0,pad.t,0,pad.t+ch);grad.addColorStop(0,'rgba(22,163,74,.20)');grad.addColorStop(1,'rgba(22,163,74,0)');
+  c.beginPath();c.moveTo(xs[0],pad.t+ch);xs.forEach((x,i)=>c.lineTo(x,ys[i]));c.lineTo(xs[xs.length-1],pad.t+ch);c.closePath();c.fillStyle=grad;c.fill();
+  c.beginPath();xs.forEach((x,i)=>{if(i===0)c.moveTo(x,ys[i]);else{let px=xs[i-1],py=ys[i-1],mx=(px+x)/2;c.bezierCurveTo(mx,py,mx,ys[i],x,ys[i])}});
+  c.strokeStyle='#16a34a';c.lineWidth=3;c.lineCap='round';c.stroke();
+  xs.forEach((x,i)=>{
+    let val=+data[i].value||0;
+    c.beginPath();c.arc(x,ys[i],3.5,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.strokeStyle='#16a34a';c.lineWidth=2;c.stroke();
+    c.fillStyle='#111827';c.font='bold 8px system-ui';c.textAlign='center';
+    c.fillText(val?('R$ '+val.toLocaleString('pt-BR',{maximumFractionDigits:0})):'R$ 0',x,Math.max(10,ys[i]-8));
+  });
+  c.fillStyle='#6b7280';c.font='9px system-ui';c.textAlign='center';data.forEach((x,i)=>c.fillText(x.label,xs[i],h-9));
+}
+function settings(){open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
+function fab(){let m=$('fabMenu');m.classList.toggle('show')}
+function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
+function fabAction(action){
+  closeFab();
+  if(action==='in'){show('finance');newTxType('in');return}
+  if(action==='out'){show('finance');newTxType('out');return}
+  if(action==='agenda'){show('agenda');return}
+  if(action==='reports'){show('reports');return}
+  if(action==='finance'){show('finance');return}
+  if(action==='life'){show('life');return}
+  if(action==='stock'){show('stock');return}
+}
+$('modal').onclick=e=>{if(e.target.id==='modal')close()};head();home();
+</script></body></html>
