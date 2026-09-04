@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEXO 1.7 — Gestão para Barbeiros</title><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEXO 1.7.2 — Gestão para Barbeiros</title><style>
 *{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#111827;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}.app{max-width:540px;margin:auto;padding-bottom:82px}header{padding:20px 16px 10px;display:flex;justify-content:space-between}.logo{font-size:25px;font-weight:900}.logo i{color:#16a34a;font-style:normal}.date{font-size:11px;color:#6b7280;text-align:right}.screen{display:none;padding:8px 16px}.active{display:block}.hero{background:#111827;color:#fff;border-radius:22px;padding:20px}.hero .small{color:#fff;opacity:.7}.big{font-size:32px;font-weight:900}.small,.sub,.muted{font-size:12px;color:#6b7280}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.metric,.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}.metric{padding:14px}.value{font-size:20px;font-weight:800;margin-top:4px}.card{padding:15px;margin:12px 0}.section{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 10px}.section h2{font-size:17px;margin:0}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.item{padding:13px 0;border-bottom:1px solid #e5e7eb}.item:last-child{border:0}.name{font-weight:800}.btn{border:0;border-radius:12px;padding:10px 13px;font-weight:750}.primary{background:#16a34a;color:#fff}.dark{background:#111827;color:#fff}.ghost{background:#f3f4f6}.danger{background:#fee2e2;color:#991b1b}.blue{background:#dbeafe;color:#1d4ed8}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.actions>*{flex:1}.badge{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:800}.green{background:#dcfce7;color:#166534}.orange{background:#fff7ed;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.progress{height:9px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:9px}.progress div{height:100%;background:#16a34a;width:0}.search,.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;outline:0}.empty{text-align:center;padding:24px;color:#6b7280;font-size:13px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);height:70px;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(5,1fr);z-index:5}.nav button{border:0;background:none;color:#6b7280;font-size:10px;font-weight:700}.nav button.active{color:#16a34a}.nav b{display:block;font-size:20px}.fab{position:fixed;right:18px;bottom:82px;width:54px;height:54px;border:0;border-radius:50%;background:#16a34a;color:#fff;font-size:27px;z-index:6}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:10}.modal.show{display:flex}.sheet{background:#fff;width:min(540px,100%);margin:auto;border-radius:24px 24px 0 0;padding:18px;max-height:90vh;overflow:auto}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:5px}hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}.notice{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;padding:13px;border-radius:15px;font-size:12px}@media print{.nav,.fab,header,.screen:not(#reports){display:none!important}#reports{display:block!important}.app{max-width:none;padding:0}.card,.metric{break-inside:avoid}}
 .fabmenu{position:fixed;right:18px;bottom:145px;z-index:7;display:none;flex-direction:column;gap:7px;align-items:flex-end}
 .fabmenu.show{display:flex}
@@ -64,6 +64,42 @@ body.locked-scroll{overflow:hidden}
 .splash-word.nexo-wordmark .brand-piece:nth-child(4){animation-delay:1.04s}
 .splash-word.nexo-wordmark{color:#f8fafc}.splash-word.nexo-wordmark .nexo-scissor{width:.84em;height:.84em;margin:0 .055em}
 @media(max-width:380px){.logo.nexo-wordmark{font-size:31px!important}.auth-logo.nexo-wordmark{font-size:32px}.splash-word.nexo-wordmark{font-size:48px}}
+
+/* ===== NEXO 1.7.2 — APARÊNCIA ===== */
+body,body .card,body .metric,body .nav,body .sheet,body .search,body .field input,body .field select,body .field textarea,body .fabmenu button{transition:background-color .22s ease,color .22s ease,border-color .22s ease}
+.theme-picker{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:8px}
+.theme-option{border:1px solid #e5e7eb;background:#fff;border-radius:14px;padding:12px 10px;text-align:left;cursor:pointer;font-weight:800;color:#111827}
+.theme-option small{display:block;font-size:10px;font-weight:650;color:#6b7280;margin-top:3px}
+.theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px #16a34a22}
+.theme-option .theme-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid #0002}
+.theme-option.light .theme-dot{background:#f4f6f8}
+.theme-option.nexo .theme-dot{background:#b8d7c6}
+body.theme-nexo{background:#eaf3ee;color:#17352b}
+body.theme-nexo header{color:#17352b}
+body.theme-nexo #headerBiz,body.theme-nexo .date{color:#557066!important}
+body.theme-nexo .card,body.theme-nexo .metric{background:#dcebe3;border-color:#c4dbcf}
+body.theme-nexo .hero{background:#21483b;color:#f7fbf9}
+body.theme-nexo .small,body.theme-nexo .sub,body.theme-nexo .muted,body.theme-nexo .report-note{color:#587269}
+body.theme-nexo .hero .small{color:#f7fbf9}
+body.theme-nexo .item{border-color:#c4dbcf}
+body.theme-nexo .nav{background:#dfece5;border-color:#c4dbcf}
+body.theme-nexo .nav button{color:#587269}
+body.theme-nexo .nav button.active{color:#12814e}
+body.theme-nexo .sheet{background:#eaf3ee}
+body.theme-nexo .search,body.theme-nexo .field input,body.theme-nexo .field select,body.theme-nexo .field textarea{background:#f5faf7;border-color:#bfd6ca;color:#17352b}
+body.theme-nexo .field label{color:#557066}
+body.theme-nexo .ghost{background:#cfdfd6;color:#234438}
+body.theme-nexo .dark{background:#21483b;color:#fff}
+body.theme-nexo .blue{background:#d8e9e1;color:#245848}
+body.theme-nexo .progress{background:#c2d7cb}
+body.theme-nexo .fabmenu button{background:#e6f1eb;color:#17352b;border-color:#c4dbcf}
+body.theme-nexo .fabmenu button:hover{background:#dcebe3}
+body.theme-nexo .ranknum{background:#cbded3;color:#234438}
+body.theme-nexo hr{border-color:#c4dbcf}
+body.theme-nexo .notice{background:#d8eee2;border-color:#acd2bc;color:#225f3d}
+body.theme-nexo .theme-option{background:#f5faf7;border-color:#bfd6ca;color:#17352b}
+body.theme-nexo .theme-option small{color:#587269}
+body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px #16a34a22}
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -300,7 +336,7 @@ body.locked-scroll{overflow:hidden}
     <button class="btn danger" onclick="logoutNexo()">Sair</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.7.1 — Relacionamento</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios + WhatsApp inteligente + Recomendações</div></div></section>
+<div class="card"><b>NEXO 1.7.2 — Aparência</b><div class="sub">Todos os recursos da 1.7.1 + escolha entre tema Claro e Verde NEXO</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -436,7 +472,7 @@ function goHotmart(){if(NEXO_HOTMART_URL.startsWith('http'))location.href=NEXO_H
 /* ===== NEXO 1.7 — NUVEM + RELACIONAMENTO ===== */
 let cloudSyncTimer=null, cloudUnsubscribe=null, applyingCloud=false, cloudReady=false;
 function normalizeNexoData(data){
-  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
   const x=(data&&typeof data==='object')?JSON.parse(JSON.stringify(data)):base;
   x.settings={...base.settings,...(x.settings||{})};
   ['clients','services','appointments','tx','bills','stock','stockMoves'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});
@@ -478,7 +514,7 @@ async function syncCloudOnLogin(){
   const ref=firestore.collection('users').doc(currentFirebaseUser.uid);
   const snap=await ref.get(),profile=snap.data()||{},cloudData=profile.appData;
   const merged=cloudData?mergeNexoData(cloudData,db):normalizeNexoData(db);
-  applyingCloud=true;db=merged;localStorage.setItem(K,JSON.stringify(db));applyingCloud=false;
+  applyingCloud=true;db=merged;localStorage.setItem(K,JSON.stringify(db));applyTheme(db.settings.theme);applyingCloud=false;
   cloudReady=true;
   await ref.set({appData:db,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
   if(cloudUnsubscribe)cloudUnsubscribe();
@@ -486,7 +522,7 @@ async function syncCloudOnLogin(){
     const remote=doc.data()?.appData;if(!remote||applyingCloud)return;
     const normalized=normalizeNexoData(remote);
     if(JSON.stringify(normalized)===JSON.stringify(normalizeNexoData(db)))return;
-    applyingCloud=true;db=normalized;localStorage.setItem(K,JSON.stringify(db));applyingCloud=false;rerenderCurrentScreen();
+    applyingCloud=true;db=normalized;localStorage.setItem(K,JSON.stringify(db));applyTheme(db.settings.theme);applyingCloud=false;rerenderCurrentScreen();
   },err=>console.error('NEXO cloud listener:',err));
 }
 async function bootNexo(){
@@ -508,9 +544,21 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.7.1',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
-db=normalizeNexoData(db);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.settings.openTime=db.settings.openTime||'09:00';db.settings.closeTime=db.settings.closeTime||'19:00';db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
+const K='NEXO13',NEXO_APP_VERSION='1.7.2',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function applyTheme(theme){
+  const chosen=theme==='nexo'?'nexo':'light';
+  document.body.classList.toggle('theme-nexo',chosen==='nexo');
+  const meta=document.querySelector('meta[name=\"theme-color\"]');
+  if(meta)meta.setAttribute('content',chosen==='nexo'?'#eaf3ee':'#111827');
+}
+function setThemeChoice(theme){
+  const chosen=theme==='nexo'?'nexo':'light';
+  const input=$('stheme');if(input)input.value=chosen;
+  document.querySelectorAll('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.theme===chosen));
+  applyTheme(chosen);
+}
+let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+db=normalizeNexoData(db);db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';applyTheme(db.settings.theme);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.settings.openTime=db.settings.openTime||'09:00';db.settings.closeTime=db.settings.closeTime||'19:00';db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
 function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function close(){$('modal').classList.remove('show')}
 function show(id,b){closeFab();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}if(id==='home')home();if(id==='agenda')agenda();if(id==='clients')renderClients();if(id==='services')renderServices();if(id==='finance')finance();if(id==='life')life($('lifeMonth')?.value||currentMonth());if(id==='goals')goals();if(id==='stock')stock();if(id==='reports')reports()}
 function head(){$('date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});$('biz').textContent=db.settings.business;if($('headerBiz'))$('headerBiz').textContent=db.settings.business;if($('agendaPicker')&&!$('agendaPicker').value)$('agendaPicker').value=T();$('agendaDate').textContent='Hoje • '+dbr(T())}
@@ -1217,7 +1265,7 @@ function drawReportLine(id,data){
   });
   c.fillStyle='#6b7280';c.font='9px system-ui';c.textAlign='center';data.forEach((x,i)=>c.fillText(x.label,xs[i],h-9));
 }
-function settings(){open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
+function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
 function fabAction(action){
