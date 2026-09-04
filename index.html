@@ -388,7 +388,7 @@ body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px
 /* ===== NEXO FIREBASE AUTH + TESTE 7 DIAS ===== */
 const NEXO_TRIAL_DAYS = 7;
 const NEXO_ANNUAL_ACCESS_DAYS = 365;
-const NEXO_HOTMART_URL = 'COLE_AQUI_SEU_LINK_DA_HOTMART';
+const NEXO_HOTMART_URL = 'https://pay.hotmart.com/D107462123Q?off=0xltzstu';
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD6sqjl4p4UAacaSach18PFxNHHlwkbC_0",
@@ -603,7 +603,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.7.4',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.7.5',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
