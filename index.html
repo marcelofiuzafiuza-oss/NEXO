@@ -300,7 +300,7 @@ body.locked-scroll{overflow:hidden}
     <button class="btn danger" onclick="logoutNexo()">Sair</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.7 — Relacionamento</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios + WhatsApp + Recomendações</div></div></section>
+<div class="card"><b>NEXO 1.7.1 — Relacionamento</b><div class="sub">Agenda + Clientes + Serviços + Financeiro + Minha Vida + Metas + Estoque + Relatórios + WhatsApp + Recomendações</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -508,7 +508,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.7',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.7.1',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
 db=normalizeNexoData(db);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
 function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function close(){$('modal').classList.remove('show')}
@@ -584,8 +584,11 @@ function normalizePhoneBR(phone){
   return n;
 }
 function openWhatsApp(phone,message){
-  const n=normalizePhoneBR(phone);if(!n)return alert('Cadastre o telefone do cliente para usar o WhatsApp.');
-  window.open(`https://wa.me/${n}?text=${encodeURIComponent(message)}`,'_blank');
+  const n=normalizePhoneBR(phone);
+  if(!n)return alert('Cadastre o telefone do cliente para usar o WhatsApp.');
+  const url=`https://wa.me/${n}?text=${encodeURIComponent(message)}`;
+  // Abre na mesma navegação para evitar bloqueadores de pop-up em Android/tablets.
+  window.location.href=url;
 }
 function whatsappClient(id){const c=db.clients.find(x=>x.id===id);if(!c)return;openWhatsApp(c.phone,`Olá, ${c.name}! Tudo bem? Aqui é da ${db.settings.business}. ✂️`)}
 function whatsappAppointment(id,type='confirm'){
