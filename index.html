@@ -173,9 +173,9 @@ body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px
 <div class="lock-screen" id="trialLock">
   <div class="lock-card">
     <div class="lock-icon">🔒</div>
-    <h2>Seu período de teste terminou</h2>
-    <p>Os 7 dias gratuitos do NEXO chegaram ao fim. Para continuar usando sua agenda, financeiro, relatórios e demais recursos, escolha um plano.</p>
-    <button class="btn primary purchase-btn" onclick="goHotmart()">Ver planos e continuar</button>
+    <h2 id="accessLockTitle">Seu período de teste terminou</h2>
+    <p id="accessLockText">Os 7 dias gratuitos do NEXO chegaram ao fim. Para continuar usando sua agenda, financeiro, relatórios e demais recursos, adquira 12 meses de acesso.</p>
+    <button class="btn primary purchase-btn" id="accessLockButton" onclick="goHotmart()">Garantir 12 meses de acesso</button>
     <button class="logout-link" onclick="logoutNexo()">Sair da conta</button>
   </div>
 </div>
@@ -387,6 +387,7 @@ body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px
 <script>
 /* ===== NEXO FIREBASE AUTH + TESTE 7 DIAS ===== */
 const NEXO_TRIAL_DAYS = 7;
+const NEXO_ANNUAL_ACCESS_DAYS = 365;
 const NEXO_HOTMART_URL = 'COLE_AQUI_SEU_LINK_DA_HOTMART';
 
 const FIREBASE_CONFIG = {
@@ -454,19 +455,44 @@ async function createUserProfileIfNeeded(user,nameHint=''){
   if(Object.keys(safeUpdate).length)await ref.set(safeUpdate,{merge:true});
   return {...data,...safeUpdate};
 }
+function firebaseTimeMs(ts){
+  if(ts&&typeof ts.toMillis==='function')return ts.toMillis();
+  if(ts&&ts.seconds)return ts.seconds*1000;
+  if(typeof ts==='number')return ts;
+  if(typeof ts==='string'){const n=Date.parse(ts);return Number.isNaN(n)?null:n}
+  return null;
+}
 function profileTrialState(profile){
   const status=String(profile?.subscriptionStatus||'trial').toLowerCase();
+  const plan=String(profile?.plan||'trial').toLowerCase();
   const paid=['active','paid','subscribed'].includes(status);
-  if(paid)return {paid:true,expired:false,daysLeft:null,status};
-  const ts=profile?.trialStart;
-  let startMs=null;
-  if(ts&&typeof ts.toMillis==='function')startMs=ts.toMillis();
-  else if(ts&&ts.seconds)startMs=ts.seconds*1000;
-  else if(typeof ts==='number')startMs=ts;
-  if(!startMs)return {paid:false,expired:false,daysLeft:NEXO_TRIAL_DAYS,status:'trial'};
+  if(paid){
+    const expiresMs=firebaseTimeMs(profile?.accessExpiresAt);
+    if(expiresMs){
+      const expired=Date.now()>=expiresMs;
+      const daysLeft=Math.max(0,Math.ceil((expiresMs-Date.now())/86400000));
+      return {paid:!expired,expired,daysLeft,status,plan,kind:'annual',expiresMs};
+    }
+    // Compatibilidade temporária com contas já marcadas como ativas antes do plano anual.
+    return {paid:true,expired:false,daysLeft:null,status,plan,kind:'legacy-active',expiresMs:null};
+  }
+  const startMs=firebaseTimeMs(profile?.trialStart);
+  if(!startMs)return {paid:false,expired:false,daysLeft:NEXO_TRIAL_DAYS,status:'trial',plan:'trial',kind:'trial'};
   const elapsed=(Date.now()-startMs)/86400000;
   const daysLeft=Math.max(0,Math.ceil(NEXO_TRIAL_DAYS-elapsed));
-  return {paid:false,expired:elapsed>=NEXO_TRIAL_DAYS,daysLeft,status:'trial'};
+  return {paid:false,expired:elapsed>=NEXO_TRIAL_DAYS,daysLeft,status:'trial',plan:'trial',kind:'trial'};
+}
+function setAccessLock(kind){
+  const title=$('accessLockTitle'),text=$('accessLockText'),button=$('accessLockButton');
+  if(kind==='annual'){
+    if(title)title.textContent='Seu acesso anual terminou';
+    if(text)text.textContent='Seus 12 meses de NEXO chegaram ao fim. Renove seu acesso para continuar usando sua agenda, financeiro, relatórios e demais recursos.';
+    if(button)button.textContent='Renovar acesso por 12 meses';
+  }else{
+    if(title)title.textContent='Seu período de teste terminou';
+    if(text)text.textContent='Os 7 dias gratuitos do NEXO chegaram ao fim. Para continuar usando sua agenda, financeiro, relatórios e demais recursos, adquira 12 meses de acesso.';
+    if(button)button.textContent='Garantir 12 meses de acesso';
+  }
 }
 async function checkAccess(){
   if(!currentFirebaseUser){$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');showAuth();return}
@@ -475,10 +501,12 @@ async function checkAccess(){
     if($('accountEmail'))$('accountEmail').textContent=currentFirebaseUser.email||'';
     const t=profileTrialState(currentUserProfile);
     $('trialBanner').classList.add('show');
-    if(t.paid)$('trialBanner').textContent='NEXO • Assinatura ativa';
+    if(t.paid&&t.kind==='annual')$('trialBanner').textContent=`NEXO • Plano anual ativo • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
+    else if(t.paid)$('trialBanner').textContent='NEXO • Acesso ativo';
+    else if(t.expired&&t.kind==='annual')$('trialBanner').textContent='Seu acesso anual terminou.';
     else if(t.expired)$('trialBanner').textContent='Seu período de teste terminou.';
     else $('trialBanner').textContent=`Você está no período de teste • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
-    if(t.expired&&!t.paid){$('trialLock').classList.add('show');document.body.classList.add('locked-scroll')}
+    if(t.expired&&!t.paid){setAccessLock(t.kind);$('trialLock').classList.add('show');document.body.classList.add('locked-scroll')}
     else{$('trialLock').classList.remove('show');document.body.classList.remove('locked-scroll')}
   }catch(err){console.error(err);authMessage('Não foi possível validar seu acesso no Firebase.');showAuth()}
 }
@@ -575,7 +603,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.7.2',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.7.4',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
