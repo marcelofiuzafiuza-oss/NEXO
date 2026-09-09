@@ -131,6 +131,24 @@ body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px
 @media (max-width:540px){
   .app{width:100%;max-width:540px}
 }
+
+/* ===== NEXO 1.8.0 • PERFIS BARBER + BEAUTY ===== */
+body.theme-beauty{background:#fbf4f8;color:#3d2636}
+body.theme-beauty .card,body.theme-beauty .metric{background:#fff9fc;border-color:#f0dbe8}
+body.theme-beauty .hero{background:linear-gradient(135deg,#5d244f,#9b3f86)}
+body.theme-beauty .primary,body.theme-beauty .fab,body.theme-beauty .progress div{background:#b83f98;color:#fff}
+body.theme-beauty .nav button.active,body.theme-beauty .logo,body.theme-beauty .nexo-o{color:#b83f98}
+body.theme-beauty .trial-banner{background:#f9e8f4;border-color:#edcce3;color:#7a2e69}
+body.theme-neutral{background:#f5f5f4;color:#292524}
+body.theme-neutral .primary,body.theme-neutral .fab,body.theme-neutral .progress div{background:#57534e;color:#fff}
+body.theme-darkbrand{background:#111827;color:#f9fafb}
+body.theme-darkbrand .card,body.theme-darkbrand .metric{background:#1f2937;border-color:#374151;color:#f9fafb}
+body.theme-darkbrand .sub,body.theme-darkbrand .muted,body.theme-darkbrand .small{color:#cbd5e1}
+body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
+.biz-setup{position:fixed;inset:0;z-index:30;background:rgba(7,18,16,.97);display:none;align-items:center;justify-content:center;padding:16px}
+.biz-setup.show{display:flex}.setup-card{width:min(560px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;color:#111827;box-shadow:0 30px 80px #0008}
+.setup-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.setup-brand{font-size:27px;font-weight:900}.setup-brand span{color:#16a34a}.setup-step{font-size:11px;color:#6b7280;font-weight:800}.setup-title{font-size:24px;line-height:1.12;margin:8px 0}.setup-copy{font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:15px}.setup-options{display:grid;gap:9px}.setup-option{width:100%;text-align:left;border:1px solid #e5e7eb;background:#fff;border-radius:16px;padding:13px;display:flex;gap:11px;align-items:center;cursor:pointer}.setup-option.selected{border:2px solid #16a34a;background:#ecfdf5}.setup-option .ico{font-size:24px;width:32px;text-align:center}.setup-option b{display:block}.setup-option small{display:block;color:#6b7280;margin-top:2px}.setup-grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.setup-actions{display:flex;gap:8px;margin-top:18px}.setup-actions button{flex:1}.setup-dots{text-align:center;color:#d1d5db;letter-spacing:5px;margin:14px 0 2px}.setup-dots .on{color:#16a34a}.setup-check{display:flex;gap:9px;align-items:center;border-bottom:1px solid #eee;padding:10px 3px}.setup-check input{width:18px;height:18px;accent-color:#16a34a}.setup-preview{border-radius:18px;padding:16px;background:#111827;color:#fff;margin:10px 0}.setup-preview.beauty{background:linear-gradient(135deg,#632654,#b44398)}.setup-preview.neutral{background:#57534e}.setup-preview.dark{background:#0b1220}.setup-done{text-align:center;padding:12px 2px}.setup-done .done-icon{font-size:48px}.setup-note{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:14px;padding:11px;font-size:12px;margin-top:10px}
+@media(max-width:420px){.setup-card{padding:16px}.setup-title{font-size:21px}.setup-grid2{grid-template-columns:1fr}}
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -180,6 +198,15 @@ body.theme-nexo .theme-option.selected{border-color:#16a34a;box-shadow:0 0 0 2px
   </div>
 </div>
 
+
+<div class="biz-setup" id="businessSetup">
+  <div class="setup-card">
+    <div class="setup-top"><div class="setup-brand">NE<span>X</span>O</div><div class="setup-step" id="setupStepLabel">1 de 7</div></div>
+    <div id="setupBody"></div>
+    <div class="setup-dots" id="setupDots"></div>
+    <div class="setup-actions" id="setupActions"></div>
+  </div>
+</div>
 <div class="app"><header style="align-items:flex-start"><div><div class="logo nexo-wordmark" style="font-size:34px;line-height:1"><span>NE</span><svg class="nexo-scissor" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="16" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><circle cx="48" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><path d="M21.5 42.5 49.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><path d="M42.5 42.5 14.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><circle cx="32" cy="30" r="3.4" fill="#fff" stroke="currentColor" stroke-width="3"/></svg><span class="nexo-o">O</span></div><div id="headerBiz" class="sub" style="margin-top:5px;font-weight:700;color:#374151"></div></div><div class="date" id="date"></div></header>
 <div class="trial-banner" id="trialBanner"></div>
 
@@ -442,7 +469,8 @@ async function createUserProfileIfNeeded(user,nameHint=''){
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       trialStart:firebase.firestore.FieldValue.serverTimestamp(),
       subscriptionStatus:'trial',
-      plan:'trial'
+      plan:'trial',
+      needsBusinessSetup:true
     });
     const fresh=await ref.get();
     return fresh.data()||{};
@@ -531,7 +559,7 @@ function goHotmart(){if(NEXO_HOTMART_URL.startsWith('http'))location.href=NEXO_H
 /* ===== NEXO 1.7 — NUVEM + RELACIONAMENTO ===== */
 let cloudSyncTimer=null, cloudUnsubscribe=null, applyingCloud=false, cloudReady=false;
 function normalizeNexoData(data){
-  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
   const x=(data&&typeof data==='object')?JSON.parse(JSON.stringify(data)):base;
   x.settings={...base.settings,...(x.settings||{})};
   ['clients','services','appointments','tx','bills','stock','stockMoves'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});
@@ -584,6 +612,52 @@ async function syncCloudOnLogin(){
     applyingCloud=true;db=normalized;localStorage.setItem(K,JSON.stringify(db));applyTheme(db.settings.theme);applyingCloud=false;rerenderCurrentScreen();
   },err=>console.error('NEXO cloud listener:',err));
 }
+
+/* ===== NEXO 1.8.0 • ONBOARDING ADAPTATIVO ===== */
+let setupState={step:0,segment:'barber',activities:['barber'],business:'',openTime:'09:00',closeTime:'19:00',services:[],brandTheme:'barber'};
+const setupActivityMap={
+ barber:{label:'Barbearia',icon:'💈',services:['Corte','Barba','Corte + Barba']},
+ hair:{label:'Cabelo / Salão',icon:'💇',services:['Corte feminino','Escova','Coloração']},
+ nails:{label:'Unhas / Manicure',icon:'💅',services:['Manicure','Pedicure','Esmaltação em gel','Alongamento de unhas','Manutenção de alongamento']},
+ brows:{label:'Sobrancelhas',icon:'👁️',services:['Design de sobrancelhas','Design com henna']},
+ lashes:{label:'Cílios',icon:'✨',services:['Extensão de cílios','Manutenção de cílios']},
+ depilation:{label:'Depilação',icon:'🌸',services:['Depilação facial','Depilação axilas','Depilação pernas']},
+ makeup:{label:'Maquiagem',icon:'💄',services:['Maquiagem social']},
+ facial:{label:'Estética facial',icon:'🧴',services:['Limpeza de pele']},
+ other:{label:'Outro',icon:'➕',services:[]}
+};
+function setupSelectedActivities(){return setupState.activities.map(k=>setupActivityMap[k]).filter(Boolean)}
+function setupSuggestedServices(){return [...new Set(setupSelectedActivities().flatMap(x=>x.services))]}
+function setupOpen(){setupState.business=db.settings.business==='Minha Barbearia'?'':(db.settings.business||'');$('businessSetup').classList.add('show');document.body.classList.add('locked-scroll');renderSetup()}
+function setupClose(){ $('businessSetup').classList.remove('show');document.body.classList.remove('locked-scroll') }
+function setupDots(){return Array.from({length:7},(_,i)=>`<span class="${i===setupState.step?'on':''}">●</span>`).join('')}
+function setSegment(v){setupState.segment=v;setupState.activities=v==='barber'?['barber']:[];renderSetup()}
+function toggleActivity(k){const a=setupState.activities;setupState.activities=a.includes(k)?a.filter(x=>x!==k):[...a,k];renderSetup()}
+function setBrandTheme(v){setupState.brandTheme=v;renderSetup()}
+function setupNext(){if(setupState.step===1&&setupState.activities.length===0)return alert('Escolha pelo menos uma área de atuação.');if(setupState.step===2){setupState.business=($('setupBusiness')?.value||'').trim();setupState.openTime=$('setupOpen')?.value||'09:00';setupState.closeTime=$('setupClose')?.value||'19:00';if(!setupState.business)return alert('Digite o nome do seu negócio.')}if(setupState.step===3){setupState.services=[...document.querySelectorAll('[data-setup-service]:checked')].map(x=>x.value)}if(setupState.step<6){setupState.step++;renderSetup()}else finishBusinessSetup()}
+function setupBack(){if(setupState.step>0){setupState.step--;renderSetup()}}
+function renderSetup(){
+ const step=setupState.step; $('setupStepLabel').textContent=`${step+1} de 7`; $('setupDots').innerHTML=setupDots();
+ let body='';
+ if(step===0)body=`<div class="setup-done"><div class="done-icon">✂️</div><h2 class="setup-title">Bem-vindo ao NEXO</h2><div class="setup-copy">O mesmo NEXO agora se adapta ao seu negócio. Agenda, clientes, financeiro, metas, estoque, relatórios e Minha Vida continuam juntos em um só lugar.</div><div class="setup-note"><b>7 dias gratuitos</b><br>Todos os recursos, sem cartão e sem compromisso.</div></div>`;
+ if(step===1){const opts=Object.entries(setupActivityMap).filter(([k])=>setupState.segment==='barber'?k==='barber':k!=='barber');body=`<h2 class="setup-title">Qual é o seu negócio?</h2><div class="setup-copy">Você pode trabalhar em mais de uma área. O NEXO vai personalizar sugestões e aparência sem mudar as funções do sistema.</div><div class="setup-grid2"><button class="setup-option ${setupState.segment==='barber'?'selected':''}" onclick="setSegment('barber')"><span class="ico">💈</span><span><b>Barbearia</b><small>Corte, barba e cuidados masculinos</small></span></button><button class="setup-option ${setupState.segment==='beauty'?'selected':''}" onclick="setSegment('beauty')"><span class="ico">✨</span><span><b>Beleza / Estética</b><small>Unhas, sobrancelhas, cílios, depilação e mais</small></span></button></div><h3 style="margin:18px 0 6px">O que você faz?</h3><div>${opts.map(([k,o])=>`<label class="setup-check"><input type="checkbox" ${setupState.activities.includes(k)?'checked':''} onchange="toggleActivity('${k}')"><span>${o.icon} ${o.label}</span></label>`).join('')}</div>`}
+ if(step===2)body=`<h2 class="setup-title">Vamos configurar seu negócio</h2><div class="setup-copy">Essas informações podem ser alteradas depois em Configurações.</div><div class="field"><label>Nome do negócio</label><input id="setupBusiness" value="${E(setupState.business)}" placeholder="Ex.: Studio da Rafa"></div><div class="grid"><div class="field"><label>Abre às</label><input id="setupOpen" type="time" value="${setupState.openTime}"></div><div class="field"><label>Fecha às</label><input id="setupClose" type="time" value="${setupState.closeTime}"></div></div>`;
+ if(step===3){const sug=setupSuggestedServices();body=`<h2 class="setup-title">Serviços iniciais</h2><div class="setup-copy">Selecionamos algumas sugestões de acordo com suas atividades. Você poderá editar preços, duração, retorno ou cadastrar outros depois.</div><div>${(sug.length?sug:['Meu serviço']).map(x=>`<label class="setup-check"><input data-setup-service type="checkbox" value="${E(x)}" checked><span>${E(x)}</span></label>`).join('')}</div>`}
+ if(step===4)body=`<h2 class="setup-title">Escolha a identidade do seu NEXO</h2><div class="setup-copy">É o mesmo aplicativo. Só a aparência muda para combinar melhor com seu negócio.</div><div class="setup-grid2">${[['barber','Verde NEXO','Clássico e profissional'],['beauty','Beauty','Rosa/lilás elegante'],['neutral','Neutro','Claro e discreto'],['dark','Escuro','Forte e sofisticado']].map(([v,n,d])=>`<button class="setup-option ${setupState.brandTheme===v?'selected':''}" onclick="setBrandTheme('${v}')"><span><b>${n}</b><small>${d}</small></span></button>`).join('')}</div><div class="setup-preview ${setupState.brandTheme}"><b style="font-size:22px">NEXO</b><div style="opacity:.8;margin-top:4px">${setupState.business||'Seu negócio'} • ${setupState.segment==='barber'?'Gestão para Barbeiros':'Gestão para Profissionais da Beleza'}</div></div>`;
+ if(step===5)body=`<h2 class="setup-title">Um sistema. Toda a sua rotina.</h2><div class="setup-copy">Você continuará usando as telas reais do NEXO, agora configuradas para o seu perfil.</div><div class="setup-options">${[['📅','Agenda','Organize horários e atendimentos'],['👥','Clientes','Histórico, retorno e WhatsApp'],['💰','Financeiro','Receitas, despesas, ticket e relatórios'],['🎯','Metas e estoque','Acompanhe objetivos e produtos'],['🏠','Minha Vida','Organize também suas contas pessoais']].map(x=>`<div class="setup-option"><span class="ico">${x[0]}</span><span><b>${x[1]}</b><small>${x[2]}</small></span></div>`).join('')}</div>`;
+ if(step===6)body=`<div class="setup-done"><div class="done-icon">✅</div><h2 class="setup-title">Tudo pronto!</h2><div class="setup-copy">Seu NEXO está configurado para <b>${E(setupState.business||'seu negócio')}</b>. Você tem 7 dias para conhecer todos os recursos e organizar sua rotina.</div><div class="setup-note">${setupSelectedActivities().map(x=>x.icon+' '+x.label).join(' • ')}</div></div>`;
+ $('setupBody').innerHTML=body;
+ $('setupActions').innerHTML=`${step>0?'<button class="btn ghost" onclick="setupBack()">Voltar</button>':''}<button class="btn primary" onclick="setupNext()">${step===6?'Começar a usar o NEXO':'Próximo →'}</button>`;
+}
+function applyBrandTheme(){document.body.classList.remove('theme-beauty','theme-neutral','theme-darkbrand');const t=db.settings.brandTheme||'barber';if(t==='beauty')document.body.classList.add('theme-beauty');if(t==='neutral')document.body.classList.add('theme-neutral');if(t==='dark')document.body.classList.add('theme-darkbrand');const tag=document.querySelector('.splash-tag'),sub=document.querySelector('.auth-sub');const label=db.settings.segment==='beauty'?'Gestão para Profissionais da Beleza':'Gestão para Barbeiros';if(tag)tag.textContent=label;if(sub)sub.textContent=label}
+async function finishBusinessSetup(){
+ db.settings.segment=setupState.segment;db.settings.activities=[...setupState.activities];db.settings.business=setupState.business||db.settings.business;db.settings.openTime=setupState.openTime;db.settings.closeTime=setupState.closeTime;db.settings.brandTheme=setupState.brandTheme;db.settings.onboardingV2Done=true;
+ const existing=new Set(db.services.map(s=>String(s.name||'').toLowerCase()));setupState.services.forEach(name=>{if(!existing.has(name.toLowerCase()))db.services.push({id:uid(),name,price:0,duration:30,returnDays:30})});
+ save();applyBrandTheme();head();home();setupClose();
+ if(currentFirebaseUser){try{await firestore.collection('users').doc(currentFirebaseUser.uid).set({needsBusinessSetup:false,businessSegment:setupState.segment},{merge:true});currentUserProfile={...(currentUserProfile||{}),needsBusinessSetup:false,businessSegment:setupState.segment}}catch(e){console.error('NEXO onboarding profile:',e)}}
+}
+function reopenBusinessSetup(){setupState={step:0,segment:db.settings.segment||'barber',activities:[...(db.settings.activities||['barber'])],business:db.settings.business||'',openTime:db.settings.openTime||'09:00',closeTime:db.settings.closeTime||'19:00',services:[],brandTheme:db.settings.brandTheme||'barber'};setupOpen()}
+
 async function bootNexo(){
   document.body.classList.add('locked-scroll');
   setTimeout(()=>{$('splash').classList.add('hide');setTimeout(()=>{$('splash').style.display='none'},520)},2200);
@@ -597,13 +671,13 @@ async function bootNexo(){
 
   auth.onAuthStateChanged(async user=>{
     currentFirebaseUser=user||null;currentUserProfile=null;
-    if(user){hideAuth();try{await checkAccess();await syncCloudOnLogin();if(typeof head==='function')head();if(typeof home==='function')home()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
+    if(user){hideAuth();try{await checkAccess();await syncCloudOnLogin();applyBrandTheme();if(typeof head==='function')head();if(typeof home==='function')home();if(currentUserProfile?.needsBusinessSetup===true)setupOpen()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
     else{$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');toggleAuth('login');showAuth()}
   });
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.7.5',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.8.0',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -616,7 +690,7 @@ function setThemeChoice(theme){
   document.querySelectorAll('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.theme===chosen));
   applyTheme(chosen);
 }
-let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
 db=normalizeNexoData(db);db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';applyTheme(db.settings.theme);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.settings.openTime=db.settings.openTime||'09:00';db.settings.closeTime=db.settings.closeTime||'19:00';db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
 function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function close(){$('modal').classList.remove('show')}
 function show(id,b){closeFab();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}if(id==='home')home();if(id==='agenda')agenda();if(id==='clients')renderClients();if(id==='services')renderServices();if(id==='finance')finance();if(id==='life')life($('lifeMonth')?.value||currentMonth());if(id==='goals')goals();if(id==='stock')stock();if(id==='reports')reports()}
@@ -1324,7 +1398,7 @@ function drawReportLine(id,data){
   });
   c.fillStyle='#6b7280';c.font='9px system-ui';c.textAlign='center';data.forEach((x,i)=>c.fillText(x.label,xs[i],h-9));
 }
-function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
+function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="close();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
 function fabAction(action){
