@@ -1,4 +1,13 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEXO 1.7.3 — Gestão para Barbeiros</title><style>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEXO — Gestão para seu negócio</title><link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<meta name="application-name" content="NEXO">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NEXO">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no"><style>
 *{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#111827;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}.app{max-width:540px;margin:auto;padding-bottom:82px}header{padding:20px 16px 10px;display:flex;justify-content:space-between}.logo{font-size:25px;font-weight:900}.logo i{color:#16a34a;font-style:normal}.date{font-size:11px;color:#6b7280;text-align:right}.screen{display:none;padding:8px 16px}.active{display:block}.hero{background:#111827;color:#fff;border-radius:22px;padding:20px}.hero .small{color:#fff;opacity:.7}.big{font-size:32px;font-weight:900}.small,.sub,.muted{font-size:12px;color:#6b7280}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.metric,.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px}.metric{padding:14px}.value{font-size:20px;font-weight:800;margin-top:4px}.card{padding:15px;margin:12px 0}.section{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 10px}.section h2{font-size:17px;margin:0}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.item{padding:13px 0;border-bottom:1px solid #e5e7eb}.item:last-child{border:0}.name{font-weight:800}.btn{border:0;border-radius:12px;padding:10px 13px;font-weight:750}.primary{background:#16a34a;color:#fff}.dark{background:#111827;color:#fff}.ghost{background:#f3f4f6}.danger{background:#fee2e2;color:#991b1b}.blue{background:#dbeafe;color:#1d4ed8}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.actions>*{flex:1}.badge{padding:5px 8px;border-radius:99px;font-size:10px;font-weight:800}.green{background:#dcfce7;color:#166534}.orange{background:#fff7ed;color:#9a3412}.red{background:#fee2e2;color:#991b1b}.progress{height:9px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:9px}.progress div{height:100%;background:#16a34a;width:0}.search,.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;outline:0}.empty{text-align:center;padding:24px;color:#6b7280;font-size:13px}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);height:70px;background:#fff;border-top:1px solid #e5e7eb;display:grid;grid-template-columns:repeat(5,1fr);z-index:5}.nav button{border:0;background:none;color:#6b7280;font-size:10px;font-weight:700}.nav button.active{color:#16a34a}.nav b{display:block;font-size:20px}.fab{position:fixed;right:18px;bottom:82px;width:54px;height:54px;border:0;border-radius:50%;background:#16a34a;color:#fff;font-size:27px;z-index:6}.modal{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:10}.modal.show{display:flex}.sheet{background:#fff;width:min(540px,100%);margin:auto;border-radius:24px 24px 0 0;padding:18px;max-height:90vh;overflow:auto}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:5px}hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}.notice{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;padding:13px;border-radius:15px;font-size:12px}@media print{.nav,.fab,header,.screen:not(#reports){display:none!important}#reports{display:block!important}.app{max-width:none;padding:0}.card,.metric{break-inside:avoid}}
 .fabmenu{position:fixed;right:18px;bottom:145px;z-index:7;display:none;flex-direction:column;gap:7px;align-items:flex-end}
 .fabmenu.show{display:flex}
@@ -653,8 +662,16 @@ function applyBrandTheme(){document.body.classList.remove('theme-beauty','theme-
 async function finishBusinessSetup(){
  db.settings.segment=setupState.segment;db.settings.activities=[...setupState.activities];db.settings.business=setupState.business||db.settings.business;db.settings.openTime=setupState.openTime;db.settings.closeTime=setupState.closeTime;db.settings.brandTheme=setupState.brandTheme;db.settings.onboardingV2Done=true;
  const existing=new Set(db.services.map(s=>String(s.name||'').toLowerCase()));setupState.services.forEach(name=>{if(!existing.has(name.toLowerCase()))db.services.push({id:uid(),name,price:0,duration:30,returnDays:30})});
- save();applyBrandTheme();head();home();setupClose();
- if(currentFirebaseUser){try{await firestore.collection('users').doc(currentFirebaseUser.uid).set({needsBusinessSetup:false,businessSegment:setupState.segment},{merge:true});currentUserProfile={...(currentUserProfile||{}),needsBusinessSetup:false,businessSegment:setupState.segment}}catch(e){console.error('NEXO onboarding profile:',e)}}
+ localStorage.setItem(K,JSON.stringify(db));
+ applyBrandTheme();head();home();setupClose();
+ if(currentFirebaseUser){
+   try{
+     clearTimeout(cloudSyncTimer);
+     if(cloudReady)await pushCloudNow();
+     await firestore.collection('users').doc(currentFirebaseUser.uid).set({needsBusinessSetup:false,businessSegment:setupState.segment},{merge:true});
+     currentUserProfile={...(currentUserProfile||{}),needsBusinessSetup:false,businessSegment:setupState.segment};
+   }catch(e){console.error('NEXO onboarding profile:',e)}
+ }
 }
 function reopenBusinessSetup(){setupState={step:0,segment:db.settings.segment||'barber',activities:[...(db.settings.activities||['barber'])],business:db.settings.business||'',openTime:db.settings.openTime||'09:00',closeTime:db.settings.closeTime||'19:00',services:[],brandTheme:db.settings.brandTheme||'barber'};setupOpen()}
 
@@ -677,7 +694,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.8.0',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.8.2',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -795,56 +812,93 @@ function relativeLastVisit(c){
   if(!last)return {last:null,days:null,service:'atendimento'};
   return {last,days:Math.max(0,daysBetween(last.date,T())),service:last.service||'atendimento'};
 }
+function whatsappProfile(){
+  const beauty=db.settings.segment==='beauty';
+  return beauty?{
+    icon:'✨',
+    invite:(c,detail)=>`Oi, ${c.name}! Tudo bem? Aqui é da ${db.settings.business}. ✨${detail} Quando quiser reservar um momento para cuidar de você, me chama que encontro um horário para você.`,
+    availability:(c,label,slots)=>`Oi, ${c.name}! ✨ Temos alguns horários disponíveis ${label} na ${db.settings.business}: ${slots.join(' • ')}. Se algum funcionar para você, é só me responder com o horário que prefere.`,
+    lastMinute:(c,slot)=>`Oi, ${c.name}! ✨ Surgiu um horário disponível hoje às ${slot} na ${db.settings.business}. Se quiser aproveitar esse encaixe, me responde aqui que reservo para você.`,
+    reminder:(c,a)=>`Olá, ${c.name}! 👋 Passando para lembrar do seu horário hoje às ${a.time} na ${db.settings.business}. ✨ Serviço: ${a.service}. Te esperamos!`,
+    thanks:(c)=>`Obrigada pela preferência, ${c.name}! 💖 Foi um prazer receber você hoje na ${db.settings.business}. Espero que tenha gostado do atendimento. Até a próxima!`,
+    confirm:(c,a,date)=>`Olá, ${c.name}! Tudo bem? 👋 Seu horário na ${db.settings.business} está confirmado. 📅 ${date} • ⏰ ${a.time} • ✨ ${a.service}. Te esperamos!`,
+    returning:(c,elapsed,service)=>`Oi, ${c.name}! Tudo bem? ✨ ${elapsed.charAt(0).toUpperCase()+elapsed.slice(1)} desde seu último ${service.toLowerCase()} na ${db.settings.business}. Que tal reservar seu próximo horário? Se quiser, me chama que vejo uma opção para você.`,
+    birthday:(c)=>`Feliz aniversário, ${c.name}! 🎉💖 A ${db.settings.business} deseja um dia lindo e muito especial para você. Muitas felicidades! ✨`
+  }:{
+    icon:'✂️',
+    invite:(c,detail)=>`Fala, ${c.name}! Tudo bem? Aqui é da ${db.settings.business}. ✂️${detail} Se estiver na hora de dar aquele trato no visual, me chama que encontro um horário legal para você.`,
+    availability:(c,label,slots)=>`Fala, ${c.name}! ✂️ Temos alguns horários disponíveis ${label} na ${db.settings.business}: ${slots.join(' • ')}. Se quiser agendar, é só me responder com o horário que prefere.`,
+    lastMinute:(c,slot)=>`Fala, ${c.name}! ⚡✂️ Abriu um horário hoje às ${slot} na ${db.settings.business}. Se estiver precisando dar aquele trato no visual e quiser aproveitar, me responde aqui que reservo para você.`,
+    reminder:(c,a)=>`Olá, ${c.name}! 👋 Passando para lembrar do seu horário hoje às ${a.time} na ${db.settings.business}. ✂️ Serviço: ${a.service}. Até daqui a pouco!`,
+    thanks:(c)=>`Valeu pela preferência, ${c.name}! ✂️ Foi um prazer atender você hoje na ${db.settings.business}. Até a próxima!`,
+    confirm:(c,a,date)=>`Olá, ${c.name}! Tudo bem? 👋 Passando para confirmar seu horário na ${db.settings.business}. 📅 ${date} • ⏰ ${a.time} • ✂️ ${a.service}. Te esperamos!`,
+    returning:(c,elapsed,service)=>`Fala, ${c.name}! Tudo certo? ✂️ ${elapsed.charAt(0).toUpperCase()+elapsed.slice(1)} desde seu último ${service.toLowerCase()} na ${db.settings.business}. Que tal dar aquele trato no visual? Se quiser, me chama que vejo um horário para você.`,
+    birthday:(c)=>`Feliz aniversário, ${c.name}! 🎉🎂 A ${db.settings.business} deseja um dia especial para você. Muitas felicidades! ✂️`
+  };
+}
 function clientMessageMenu(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   if(!c.phone)return alert('Cadastre o telefone do cliente para usar o WhatsApp.');
-  const info=relativeLastVisit(c),todaySlots=availableSlots(T(),5),tomorrow=addDaysISO(T(),1),tomorrowSlots=availableSlots(tomorrow,5);
+  const info=relativeLastVisit(c),todaySlots=availableSlots(T(),5),tomorrow=addDaysISO(T(),1),tomorrowSlots=availableSlots(tomorrow,5),wp=whatsappProfile();
   const lastText=info.days===null?'Sem atendimento anterior registrado':`Último atendimento há ${info.days} dia${info.days===1?'':'s'}`;
-  open(`<h3>💬 Mensagens para ${E(c.name)}</h3><div class="sub" style="margin:-3px 0 12px">${E(lastText)}. Escolha o tipo de contato e o NEXO prepara a mensagem.</div>
-    <div class="item"><div class="name">✂️ Hora de voltar</div><div class="sub">Convite baseado no último atendimento do cliente.</div><button class="btn primary" style="width:100%;margin-top:9px" onclick="whatsappReturn('${c.id}')">Preparar mensagem</button></div>
+  open(`<h3>💬 Mensagens para ${E(c.name)}</h3><div class="sub" style="margin:-3px 0 12px">${E(lastText)}. Escolha o tipo de contato e o NEXO prepara a mensagem de acordo com o perfil do seu negócio.</div>
+    <div class="item"><div class="name">${wp.icon} Hora de voltar</div><div class="sub">Convite baseado no último atendimento.</div><button class="btn primary" style="width:100%;margin-top:9px" onclick="whatsappReturn('${c.id}')">Preparar mensagem</button></div>
     <div class="item"><div class="name">📅 Horários disponíveis hoje</div><div class="sub">${todaySlots.length?E(todaySlots.join(' • ')):'Nenhum horário livre encontrado hoje.'}</div><button class="btn ghost" style="width:100%;margin-top:9px" ${todaySlots.length?'': 'disabled'} onclick="whatsappAvailability('${c.id}','today')">Enviar opções de hoje</button></div>
     <div class="item"><div class="name">📆 Horários disponíveis amanhã</div><div class="sub">${tomorrowSlots.length?E(tomorrowSlots.join(' • ')):'Nenhum horário livre encontrado amanhã.'}</div><button class="btn ghost" style="width:100%;margin-top:9px" ${tomorrowSlots.length?'': 'disabled'} onclick="whatsappAvailability('${c.id}','tomorrow')">Enviar opções de amanhã</button></div>
-    <div class="item"><div class="name">⚡ Encaixe disponível hoje</div><div class="sub">Oferece ao cliente o próximo horário livre de hoje.</div><button class="btn ghost" style="width:100%;margin-top:9px" ${todaySlots.length?'': 'disabled'} onclick="whatsappLastMinute('${c.id}')">Oferecer próximo encaixe</button></div>
-    <div class="item"><div class="name">👋 Convite para agendar</div><div class="sub">Mensagem simples para reativar o relacionamento.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappInvite('${c.id}')">Preparar convite</button></div>
+    <div class="item"><div class="name">⚡ Encaixe disponível hoje</div><div class="sub">Oferece o próximo horário livre de hoje.</div><button class="btn ghost" style="width:100%;margin-top:9px" ${todaySlots.length?'': 'disabled'} onclick="whatsappLastMinute('${c.id}')">Oferecer próximo encaixe</button></div>
+    <div class="item"><div class="name">👋 Convite para agendar</div><div class="sub">Mensagem leve para retomar o contato.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappInvite('${c.id}')">Preparar convite</button></div>
+    <div class="item"><div class="name">🎂 Aniversário</div><div class="sub">Mensagem de felicitação pronta para enviar.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappBirthday('${c.id}')">Preparar parabéns</button></div>
+    <div class="item"><div class="name">💖 Agradecimento</div><div class="sub">Uma mensagem de carinho depois do atendimento.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappThankClient('${c.id}')">Preparar agradecimento</button></div>
+    <div class="item"><div class="name">📣 Novidade / promoção</div><div class="sub">Convide o cliente para conhecer uma novidade ou condição especial.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappPromotion('${c.id}')">Preparar mensagem</button></div>
     <button class="btn ghost" style="width:100%;margin-top:14px" onclick="close()">Fechar</button>`);
 }
 function whatsappClient(id){clientMessageMenu(id)}
 function whatsappInvite(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   const info=relativeLastVisit(c),detail=info.days!==null?` Já fazem ${info.days} dias desde seu último atendimento.`:'';
-  openWhatsApp(c.phone,`Fala, ${c.name}! Tudo bem? Aqui é da ${db.settings.business}. ✂️${detail} Se estiver na hora de dar aquele trato no visual, me chama que encontro um horário legal para você.`);
+  openWhatsApp(c.phone,whatsappProfile().invite(c,detail));
 }
 function whatsappAvailability(id,when='today'){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   const date=when==='tomorrow'?addDaysISO(T(),1):T(),slots=availableSlots(date,6);
   if(!slots.length)return alert(`Não encontrei horários livres ${when==='tomorrow'?'amanhã':'hoje'}.`);
   const label=when==='tomorrow'?'amanhã':'hoje';
-  openWhatsApp(c.phone,`Fala, ${c.name}! ✂️ Temos alguns horários disponíveis ${label} na ${db.settings.business}: ${slots.join(' • ')}. Se quiser agendar, é só me responder com o horário que prefere.`);
+  openWhatsApp(c.phone,whatsappProfile().availability(c,label,slots));
 }
 function whatsappLastMinute(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   const slots=availableSlots(T(),1);if(!slots.length)return alert('Não encontrei encaixe disponível para hoje.');
-  openWhatsApp(c.phone,`Fala, ${c.name}! ⚡✂️ Abriu um horário hoje às ${slots[0]} na ${db.settings.business}. Se estiver precisando dar aquele trato no visual e quiser aproveitar, me responde aqui que reservo para você.`);
+  openWhatsApp(c.phone,whatsappProfile().lastMinute(c,slots[0]));
 }
 function whatsappAppointment(id,type='confirm'){
   const a=db.appointments.find(x=>x.id===id);if(!a)return;
   const c=clientByAppointment(a);if(!c?.phone)return alert('Este cliente não possui telefone cadastrado.');
-  const date=new Date(a.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const date=new Date(a.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}),wp=whatsappProfile();
   let msg='';
-  if(type==='reminder')msg=`Olá, ${c.name}! 👋 Passando para lembrar do seu horário hoje às ${a.time} na ${db.settings.business}. ✂️ Serviço: ${a.service}. Até daqui a pouco!`;
-  else if(type==='thanks')msg=`Valeu pela preferência, ${c.name}! ✂️ Foi um prazer atender você hoje na ${db.settings.business}. Até a próxima!`;
-  else msg=`Olá, ${c.name}! Tudo bem? 👋 Passando para confirmar seu horário na ${db.settings.business}. 📅 ${date} • ⏰ ${a.time} • ✂️ ${a.service}. Te esperamos!`;
+  if(type==='reminder')msg=wp.reminder(c,a);
+  else if(type==='thanks')msg=wp.thanks(c);
+  else msg=wp.confirm(c,a,date);
   openWhatsApp(c.phone,msg);
 }
 function whatsappReturn(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   const last=latestCompletedForClient(id),service=last?.service||'atendimento',days=last?daysBetween(last.date,T()):null;
   const elapsed=days===null?'faz um tempinho':`já fazem ${days} dias`;
-  openWhatsApp(c.phone,`Fala, ${c.name}! Tudo certo? ✂️ ${elapsed.charAt(0).toUpperCase()+elapsed.slice(1)} desde seu último ${service.toLowerCase()} na ${db.settings.business}. Que tal dar aquele trato no visual? Se quiser, me chama que vejo um horário para você.`);
+  openWhatsApp(c.phone,whatsappProfile().returning(c,elapsed,service));
 }
 function whatsappBirthday(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
-  openWhatsApp(c.phone,`Feliz aniversário, ${c.name}! 🎉🎂 A ${db.settings.business} deseja um dia especial para você. Muitas felicidades! ✂️`);
+  openWhatsApp(c.phone,whatsappProfile().birthday(c));
+}
+function whatsappThankClient(id){
+  const c=db.clients.find(x=>x.id===id);if(!c)return;
+  openWhatsApp(c.phone,whatsappProfile().thanks(c));
+}
+function whatsappPromotion(id){
+  const c=db.clients.find(x=>x.id===id);if(!c)return;
+  const beauty=db.settings.segment==='beauty';
+  const msg=beauty?`Oi, ${c.name}! ✨ Aqui é da ${db.settings.business}. Temos novidades por aqui e lembrei de você. Se quiser conhecer nossos serviços ou reservar um horário, me chama por aqui. 💖`:`Fala, ${c.name}! 👋 Aqui é da ${db.settings.business}. Temos novidades por aqui e lembrei de você. Se quiser saber mais ou reservar um horário, me chama por aqui. ✂️`;
+  openWhatsApp(c.phone,msg);
 }
 function newTx(){open(`<h3>Novo lançamento</h3><div class="field"><label>Tipo</label><select id="tt"><option value="in">Receita</option><option value="out">Despesa</option></select></div>${f('Descrição','td')}${f('Valor','tv','number','','step="0.01" min="0.01"')}${f('Data','tdate','date',T())}<div class="field"><label>Categoria</label><select id="tc"><option>Atendimento</option><option>Produtos</option><option>Aluguel</option><option>Energia</option><option>Internet</option><option>Marketing</option><option>Transporte</option><option>Outros</option></select></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addTx()">Salvar</button></div>`)}function newTxType(type){newTx();setTimeout(()=>{if($('tt'))$('tt').value=type},0)}function addTx(){let v=+$('tv').value;if(!$('td').value.trim()||v<=0)return alert('Preencha os dados.');db.tx.push({id:uid(),type:$('tt').value,amount:v,desc:$('td').value.trim(),date:$('tdate').value,cat:$('tc').value});save();close();finance($('financeDate')?.value||$('tdate')?.value||T());home()}
 function finance(sel){
@@ -1412,4 +1466,15 @@ function fabAction(action){
   if(action==='stock'){show('stock');return}
 }
 $('modal').onclick=e=>{if(e.target.id==='modal')close()};head();home();
-</script></body></html>
+</script>
+<script>
+/* NEXO 1.8.2 • PWA */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
+      .then(reg => reg.update())
+      .catch(err => console.error('NEXO PWA:', err));
+  });
+}
+</script>
+</body></html>
