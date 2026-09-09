@@ -694,7 +694,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.8.2',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.8.3',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -709,7 +709,7 @@ function setThemeChoice(theme){
 }
 let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
 db=normalizeNexoData(db);db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';applyTheme(db.settings.theme);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.settings.openTime=db.settings.openTime||'09:00';db.settings.closeTime=db.settings.closeTime||'19:00';db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
-function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function close(){$('modal').classList.remove('show')}
+function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function closeModal(){$('modal').classList.remove('show')}
 function show(id,b){closeFab();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}if(id==='home')home();if(id==='agenda')agenda();if(id==='clients')renderClients();if(id==='services')renderServices();if(id==='finance')finance();if(id==='life')life($('lifeMonth')?.value||currentMonth());if(id==='goals')goals();if(id==='stock')stock();if(id==='reports')reports()}
 function head(){$('date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});$('biz').textContent=db.settings.business;if($('headerBiz'))$('headerBiz').textContent=db.settings.business;if($('agendaPicker')&&!$('agendaPicker').value)$('agendaPicker').value=T();$('agendaDate').textContent='Hoje • '+dbr(T())}
 function daysBetween(from,to=T()){
@@ -761,22 +761,22 @@ function renderRecommendations(){
 }
 function home(){head();let a=db.appointments.filter(x=>x.date===T()),done=a.filter(x=>x.status==='completed'),r=done.reduce((s,x)=>s+ +x.value,0),ins=db.tx.filter(x=>x.date===T()&&x.type==='in').reduce((s,x)=>s+ +x.amount,0),outs=db.tx.filter(x=>x.date===T()&&x.type==='out').reduce((s,x)=>s+ +x.amount,0),g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));renderRecommendations();let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div></div><div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','reminder')">💬 Lembrar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
 
-function newClient(){open(`<h3>Novo cliente</h3>${f('Nome','cn')}${f('Telefone','cp','tel')}${f('Data de aniversário','cb','date')}<div class="field"><label>Observação</label><textarea id="co" rows="3"></textarea></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addClient()">Salvar</button></div>`)}
-function addClient(){let n=$('cn').value.trim();if(!n)return alert('Informe o nome.');db.clients.push({id:uid(),name:n,phone:$('cp').value.trim(),birthday:$('cb').value||'',note:$('co').value.trim(),visits:0,total:0,last:''});save();close();renderClients();home()}
+function newClient(){open(`<h3>Novo cliente</h3>${f('Nome','cn')}${f('Telefone','cp','tel')}${f('Data de aniversário','cb','date')}<div class="field"><label>Observação</label><textarea id="co" rows="3"></textarea></div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addClient()">Salvar</button></div>`)}
+function addClient(){let n=$('cn').value.trim();if(!n)return alert('Informe o nome.');db.clients.push({id:uid(),name:n,phone:$('cp').value.trim(),birthday:$('cb').value||'',note:$('co').value.trim(),visits:0,total:0,last:''});save();closeModal();renderClients();home()}
 function renderClients(){let q=($('search')?.value||'').toLowerCase(),a=db.clients.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));$('clientList').innerHTML=a.length?a.map(c=>`<div class="item"><div class="row"><div><div class="name">${E(c.name)}</div><div class="sub">${E(c.phone||'Sem telefone')}${c.birthday?' • 🎂 '+dbr(c.birthday):''}</div></div><b>${c.visits}x</b></div><div class="sub">Total: ${M(c.total)}</div><div class="actions">${c.phone?`<button class="btn primary" onclick="clientMessageMenu('${c.id}')">💬 Mensagens</button>`:''}<button class="btn ghost" onclick="hist('${c.id}')">Histórico</button><button class="btn blue" onclick="editClient('${c.id}')">Editar</button><button class="btn danger" onclick="delClient('${c.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum cliente encontrado.</div>'}
-function hist(id){let c=db.clients.find(x=>x.id===id),h=db.appointments.filter(x=>x.clientId===id&&x.status==='completed');open(`<h3>${E(c.name)}</h3><div class="card"><div class="row"><span>Atendimentos</span><b>${c.visits}</b></div><div class="row"><span>Total gasto</span><b>${M(c.total)}</b></div></div>${h.length?h.map(a=>`<div class="item"><div class="row"><div><b>${dbr(a.date)} • ${a.time}</b><div class="sub">${E(a.service)}</div></div><b>${M(a.value)}</b></div></div>`).join(''):'<div class="empty">Sem histórico.</div>'}<button class="btn ghost" onclick="close()">Fechar</button>`)}
-function editClient(id){let c=db.clients.find(x=>x.id===id);open(`<h3>Editar cliente</h3>${f('Nome','en','text',c.name)}${f('Telefone','ep','tel',c.phone)}${f('Data de aniversário','eb','date',c.birthday||'')}<div class="field"><label>Observação</label><textarea id="eo" rows="3">${E(c.note)}</textarea></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="updateClient('${id}')">Salvar</button></div>`)}
-function updateClient(id){let c=db.clients.find(x=>x.id===id);c.name=$('en').value.trim();c.phone=$('ep').value.trim();c.birthday=$('eb').value||'';c.note=$('eo').value.trim();db.appointments.filter(a=>a.clientId===id).forEach(a=>a.client=c.name);save();close();renderClients();home()}function delClient(id){let c=db.clients.find(x=>x.id===id);if(confirm('Excluir '+c.name+'?')){db.clients=db.clients.filter(x=>x.id!==id);save();renderClients();home()}}
-function newService(){open(`<h3>Novo serviço</h3>${f('Nome','sn')}${f('Preço','sp','number','','step="0.01" min="0"')}${f('Duração','sd','number','30','min="1"')}${f('Retorno recomendado (dias)','sr','number','20','min="0"')}<div class="sub" style="margin:-3px 0 10px">Use 0 se este serviço não tiver retorno periódico.</div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addService()">Salvar</button></div>`)}
-function addService(){let n=$('sn').value.trim(),p=+$('sp').value,d=+$('sd').value,r=Math.max(0,+$('sr').value||0);if(!n||p<0||d<=0)return alert('Preencha os dados.');db.services.push({id:uid(),name:n,price:p,duration:d,returnDays:r});save();close();renderServices();home()}
+function hist(id){let c=db.clients.find(x=>x.id===id),h=db.appointments.filter(x=>x.clientId===id&&x.status==='completed');open(`<h3>${E(c.name)}</h3><div class="card"><div class="row"><span>Atendimentos</span><b>${c.visits}</b></div><div class="row"><span>Total gasto</span><b>${M(c.total)}</b></div></div>${h.length?h.map(a=>`<div class="item"><div class="row"><div><b>${dbr(a.date)} • ${a.time}</b><div class="sub">${E(a.service)}</div></div><b>${M(a.value)}</b></div></div>`).join(''):'<div class="empty">Sem histórico.</div>'}<button class="btn ghost" onclick="closeModal()">Fechar</button>`)}
+function editClient(id){let c=db.clients.find(x=>x.id===id);open(`<h3>Editar cliente</h3>${f('Nome','en','text',c.name)}${f('Telefone','ep','tel',c.phone)}${f('Data de aniversário','eb','date',c.birthday||'')}<div class="field"><label>Observação</label><textarea id="eo" rows="3">${E(c.note)}</textarea></div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="updateClient('${id}')">Salvar</button></div>`)}
+function updateClient(id){let c=db.clients.find(x=>x.id===id);c.name=$('en').value.trim();c.phone=$('ep').value.trim();c.birthday=$('eb').value||'';c.note=$('eo').value.trim();db.appointments.filter(a=>a.clientId===id).forEach(a=>a.client=c.name);save();closeModal();renderClients();home()}function delClient(id){let c=db.clients.find(x=>x.id===id);if(confirm('Excluir '+c.name+'?')){db.clients=db.clients.filter(x=>x.id!==id);save();renderClients();home()}}
+function newService(){open(`<h3>Novo serviço</h3>${f('Nome','sn')}${f('Preço','sp','number','','step="0.01" min="0"')}${f('Duração','sd','number','30','min="1"')}${f('Retorno recomendado (dias)','sr','number','20','min="0"')}<div class="sub" style="margin:-3px 0 10px">Use 0 se este serviço não tiver retorno periódico.</div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addService()">Salvar</button></div>`)}
+function addService(){let n=$('sn').value.trim(),p=+$('sp').value,d=+$('sd').value,r=Math.max(0,+$('sr').value||0);if(!n||p<0||d<=0)return alert('Preencha os dados.');db.services.push({id:uid(),name:n,price:p,duration:d,returnDays:r});save();closeModal();renderServices();home()}
 function renderServices(){$('serviceList').innerHTML=db.services.length?db.services.map(s=>`<div class="item"><div class="row"><div><div class="name">${E(s.name)}</div><div class="sub">${s.duration} minutos${+(s.returnDays||0)>0?' • retorno em '+s.returnDays+' dias':''}</div></div><b>${M(s.price)}</b></div><div class="actions"><button class="btn blue" onclick="editService('${s.id}')">Editar</button><button class="btn danger" onclick="delService('${s.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Cadastre seus serviços.</div>'}
-function editService(id){let s=db.services.find(x=>x.id===id);open(`<h3>Editar serviço</h3>${f('Nome','un','text',s.name)}${f('Preço','up','number',s.price,'step="0.01" min="0"')}${f('Duração','ud','number',s.duration,'min="1"')}${f('Retorno recomendado (dias)','ur','number',s.returnDays??20,'min="0"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="updateService('${id}')">Salvar</button></div>`)}function updateService(id){let s=db.services.find(x=>x.id===id);s.name=$('un').value.trim();s.price=+$('up').value;s.duration=+$('ud').value;s.returnDays=Math.max(0,+$('ur').value||0);save();close();renderServices();home()}function delService(id){let s=db.services.find(x=>x.id===id);if(confirm('Excluir '+s.name+'?')){db.services=db.services.filter(x=>x.id!==id);save();renderServices();home()}}
-function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente primeiro.');if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Novo atendimento</h3><div class="field"><label>Cliente</label><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div><div class="field"><label>Serviço</label><select id="as" onchange="sync()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','ad','date',$('agendaPicker')?.value||T())}${f('Horário','at','time','09:00')}${f('Valor','av','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addAppt()">Agendar</button></div>`)}function sync(){let s=db.services.find(x=>x.id===$('as').value);$('av').value=s.price}function addAppt(){let c=db.clients.find(x=>x.id===$('ac').value),s=db.services.find(x=>x.id===$('as').value);db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('at').value,service:s.name,value:+$('av').value,date:$('ad').value,status:'scheduled'});save();close();agenda($('ad')?.value||$('agendaPicker')?.value||T());home()}
-function newManualAppt(){if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Agendamento manual</h3>${f('Nome do cliente','mac')}${f('Telefone','map','tel')}<div class="field"><label>Serviço</label><select id="mas" onchange="syncManual()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','mad','date',$('agendaPicker')?.value||T())}${f('Horário','mat','time','09:00')}${f('Valor','mav','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addManualAppt()">Agendar</button></div>`)}
+function editService(id){let s=db.services.find(x=>x.id===id);open(`<h3>Editar serviço</h3>${f('Nome','un','text',s.name)}${f('Preço','up','number',s.price,'step="0.01" min="0"')}${f('Duração','ud','number',s.duration,'min="1"')}${f('Retorno recomendado (dias)','ur','number',s.returnDays??20,'min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="updateService('${id}')">Salvar</button></div>`)}function updateService(id){let s=db.services.find(x=>x.id===id);s.name=$('un').value.trim();s.price=+$('up').value;s.duration=+$('ud').value;s.returnDays=Math.max(0,+$('ur').value||0);save();closeModal();renderServices();home()}function delService(id){let s=db.services.find(x=>x.id===id);if(confirm('Excluir '+s.name+'?')){db.services=db.services.filter(x=>x.id!==id);save();renderServices();home()}}
+function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente primeiro.');if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Novo atendimento</h3><div class="field"><label>Cliente</label><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div><div class="field"><label>Serviço</label><select id="as" onchange="sync()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','ad','date',$('agendaPicker')?.value||T())}${f('Horário','at','time','09:00')}${f('Valor','av','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addAppt()">Agendar</button></div>`)}function sync(){let s=db.services.find(x=>x.id===$('as').value);$('av').value=s.price}function addAppt(){let c=db.clients.find(x=>x.id===$('ac').value),s=db.services.find(x=>x.id===$('as').value);db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('at').value,service:s.name,value:+$('av').value,date:$('ad').value,status:'scheduled'});save();closeModal();agenda($('ad')?.value||$('agendaPicker')?.value||T());home()}
+function newManualAppt(){if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Agendamento manual</h3>${f('Nome do cliente','mac')}${f('Telefone','map','tel')}<div class="field"><label>Serviço</label><select id="mas" onchange="syncManual()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','mad','date',$('agendaPicker')?.value||T())}${f('Horário','mat','time','09:00')}${f('Valor','mav','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addManualAppt()">Agendar</button></div>`)}
 function syncManual(){let s=db.services.find(x=>x.id===$('mas').value);if(s)$('mav').value=s.price}
-function addManualAppt(){let name=$('mac').value.trim(),phone=$('map').value.trim();if(!name)return alert('Informe o nome do cliente.');let s=db.services.find(x=>x.id===$('mas').value);if(!s)return alert('Selecione um serviço.');let existing=db.clients.find(c=>c.name.trim().toLowerCase()===name.toLowerCase()&&(!phone||!c.phone||c.phone===phone));let c=existing;if(!c){c={id:uid(),name,phone,birthday:'',note:'Cliente criado automaticamente por agendamento manual',visits:0,total:0,last:''};db.clients.push(c)}else if(phone&&!c.phone){c.phone=phone}let d=$('mad').value;db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('mat').value,service:s.name,value:+$('mav').value,date:d,status:'scheduled'});save();close();agenda(d);renderClients();home()}
+function addManualAppt(){let name=$('mac').value.trim(),phone=$('map').value.trim();if(!name)return alert('Informe o nome do cliente.');let s=db.services.find(x=>x.id===$('mas').value);if(!s)return alert('Selecione um serviço.');let existing=db.clients.find(c=>c.name.trim().toLowerCase()===name.toLowerCase()&&(!phone||!c.phone||c.phone===phone));let c=existing;if(!c){c={id:uid(),name,phone,birthday:'',note:'Cliente criado automaticamente por agendamento manual',visits:0,total:0,last:''};db.clients.push(c)}else if(phone&&!c.phone){c.phone=phone}let d=$('mad').value;db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('mat').value,service:s.name,value:+$('mav').value,date:d,status:'scheduled'});save();closeModal();agenda(d);renderClients();home()}
 function agenda(sel){head();let date=sel||$('agendaPicker')?.value||T();if($('agendaPicker'))$('agendaPicker').value=date;let a=db.appointments.filter(x=>x.date===date).sort((x,y)=>x.time.localeCompare(y.time));let isToday=date===T();$('agendaDate').textContent=(isToday?'Hoje':'Data')+' • '+dbr(date);$('agendaSummary').textContent=a.filter(x=>x.status==='completed').length+' concluídos';$('agendaList').innerHTML=a.length?a.map(x=>`<div class="item"><div class="row"><b>${x.time}</b><div style="flex:1"><div class="name">${E(x.client)}</div><div class="sub">${E(x.service)} • ${M(x.value)}</div></div><span class="badge ${x.status==='completed'?'green':x.status==='cancelled'?'red':'orange'}">${x.status==='completed'?'Concluído':x.status==='cancelled'?'Cancelado':'Agendado'}</span></div>${x.status==='scheduled'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','confirm')">💬 WhatsApp</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button><button class="btn danger" onclick="cancelA('${x.id}')">Cancelar</button></div>`:x.status==='completed'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','thanks')">💬 Agradecer</button></div>`:''}</div>`).join(''):'<div class="empty">Nenhum atendimento nesta data.</div>'}
-function finish(id){let a=db.appointments.find(x=>x.id===id);if(!a||a.status!=='scheduled')return;a.status='completed';db.tx.push({id:uid(),type:'in',amount:+a.value,desc:'Atendimento: '+a.service,date:a.date,cat:'Atendimento'});let c=db.clients.find(x=>x.id===a.clientId);if(c){c.visits=(+c.visits||0)+1;c.total=(+c.total||0)+(+a.value||0);c.last=a.date}save();agenda($('agendaPicker')?.value||a.date);home();const hasPhone=!!c?.phone;open(`<div style="text-align:center;padding:6px 0 4px"><div style="font-size:38px">✓</div><h3 style="margin:5px 0">Atendimento concluído</h3><div class="sub">${E(a.client)} • ${E(a.service)} • ${M(a.value)}</div></div>${hasPhone?`<div class="notice" style="margin-top:14px">Quer aproveitar para agradecer o cliente pelo WhatsApp?</div><div class="actions"><button class="btn ghost" onclick="close()">Agora não</button><button class="btn primary" onclick="close();whatsappAppointment('${a.id}','thanks')">💬 Agradecer</button></div>`:`<button class="btn primary" style="width:100%;margin-top:14px" onclick="close()">Concluir</button>`}`)}function cancelA(id){if(confirm('Cancelar este atendimento?')){db.appointments.find(x=>x.id===id).status='cancelled';save();agenda($('agendaPicker')?.value||T());home()}}
+function finish(id){let a=db.appointments.find(x=>x.id===id);if(!a||a.status!=='scheduled')return;a.status='completed';db.tx.push({id:uid(),type:'in',amount:+a.value,desc:'Atendimento: '+a.service,date:a.date,cat:'Atendimento'});let c=db.clients.find(x=>x.id===a.clientId);if(c){c.visits=(+c.visits||0)+1;c.total=(+c.total||0)+(+a.value||0);c.last=a.date}save();agenda($('agendaPicker')?.value||a.date);home();const hasPhone=!!c?.phone;open(`<div style="text-align:center;padding:6px 0 4px"><div style="font-size:38px">✓</div><h3 style="margin:5px 0">Atendimento concluído</h3><div class="sub">${E(a.client)} • ${E(a.service)} • ${M(a.value)}</div></div>${hasPhone?`<div class="notice" style="margin-top:14px">Quer aproveitar para agradecer o cliente pelo WhatsApp?</div><div class="actions"><button class="btn ghost" onclick="closeModal()">Agora não</button><button class="btn primary" onclick="closeModal();whatsappAppointment('${a.id}','thanks')">💬 Agradecer</button></div>`:`<button class="btn primary" style="width:100%;margin-top:14px" onclick="closeModal()">Concluir</button>`}`)}function cancelA(id){if(confirm('Cancelar este atendimento?')){db.appointments.find(x=>x.id===id).status='cancelled';save();agenda($('agendaPicker')?.value||T());home()}}
 function normalizePhoneBR(phone){
   let n=String(phone||'').replace(/\D/g,'');
   if(!n)return '';
@@ -850,7 +850,7 @@ function clientMessageMenu(id){
     <div class="item"><div class="name">🎂 Aniversário</div><div class="sub">Mensagem de felicitação pronta para enviar.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappBirthday('${c.id}')">Preparar parabéns</button></div>
     <div class="item"><div class="name">💖 Agradecimento</div><div class="sub">Uma mensagem de carinho depois do atendimento.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappThankClient('${c.id}')">Preparar agradecimento</button></div>
     <div class="item"><div class="name">📣 Novidade / promoção</div><div class="sub">Convide o cliente para conhecer uma novidade ou condição especial.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappPromotion('${c.id}')">Preparar mensagem</button></div>
-    <button class="btn ghost" style="width:100%;margin-top:14px" onclick="close()">Fechar</button>`);
+    <button class="btn ghost" style="width:100%;margin-top:14px" onclick="closeModal()">Fechar</button>`);
 }
 function whatsappClient(id){clientMessageMenu(id)}
 function whatsappInvite(id){
@@ -900,7 +900,7 @@ function whatsappPromotion(id){
   const msg=beauty?`Oi, ${c.name}! ✨ Aqui é da ${db.settings.business}. Temos novidades por aqui e lembrei de você. Se quiser conhecer nossos serviços ou reservar um horário, me chama por aqui. 💖`:`Fala, ${c.name}! 👋 Aqui é da ${db.settings.business}. Temos novidades por aqui e lembrei de você. Se quiser saber mais ou reservar um horário, me chama por aqui. ✂️`;
   openWhatsApp(c.phone,msg);
 }
-function newTx(){open(`<h3>Novo lançamento</h3><div class="field"><label>Tipo</label><select id="tt"><option value="in">Receita</option><option value="out">Despesa</option></select></div>${f('Descrição','td')}${f('Valor','tv','number','','step="0.01" min="0.01"')}${f('Data','tdate','date',T())}<div class="field"><label>Categoria</label><select id="tc"><option>Atendimento</option><option>Produtos</option><option>Aluguel</option><option>Energia</option><option>Internet</option><option>Marketing</option><option>Transporte</option><option>Outros</option></select></div><div class="actions"><button class="btn ghost" onclick="close()">Cancelar</button><button class="btn primary" onclick="addTx()">Salvar</button></div>`)}function newTxType(type){newTx();setTimeout(()=>{if($('tt'))$('tt').value=type},0)}function addTx(){let v=+$('tv').value;if(!$('td').value.trim()||v<=0)return alert('Preencha os dados.');db.tx.push({id:uid(),type:$('tt').value,amount:v,desc:$('td').value.trim(),date:$('tdate').value,cat:$('tc').value});save();close();finance($('financeDate')?.value||$('tdate')?.value||T());home()}
+function newTx(){open(`<h3>Novo lançamento</h3><div class="field"><label>Tipo</label><select id="tt"><option value="in">Receita</option><option value="out">Despesa</option></select></div>${f('Descrição','td')}${f('Valor','tv','number','','step="0.01" min="0.01"')}${f('Data','tdate','date',T())}<div class="field"><label>Categoria</label><select id="tc"><option>Atendimento</option><option>Produtos</option><option>Aluguel</option><option>Energia</option><option>Internet</option><option>Marketing</option><option>Transporte</option><option>Outros</option></select></div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addTx()">Salvar</button></div>`)}function newTxType(type){newTx();setTimeout(()=>{if($('tt'))$('tt').value=type},0)}function addTx(){let v=+$('tv').value;if(!$('td').value.trim()||v<=0)return alert('Preencha os dados.');db.tx.push({id:uid(),type:$('tt').value,amount:v,desc:$('td').value.trim(),date:$('tdate').value,cat:$('tc').value});save();closeModal();finance($('financeDate')?.value||$('tdate')?.value||T());home()}
 function finance(sel){
   let date=sel||$('financeDate')?.value||T();
   if($('financeDate'))$('financeDate').value=date;
@@ -1010,7 +1010,7 @@ function newBill(){
   ${f('Quantidade de parcelas','bp','number','1','min="1" step="1"')}
   <div class="sub" style="margin-top:8px">O padrão é 1 parcela. Se informar mais, o NEXO cria as próximas automaticamente, uma por mês.</div>
   <div class="actions">
-    <button class="btn ghost" onclick="close()">Cancelar</button>
+    <button class="btn ghost" onclick="closeModal()">Cancelar</button>
     <button class="btn primary" onclick="addBill()">Salvar</button>
   </div>`)
 }
@@ -1026,7 +1026,7 @@ function addBill(){
     });
   }
   save();
-  close();
+  closeModal();
   life(due.slice(0,7));
   home();
 }
@@ -1048,7 +1048,7 @@ function delBill(id){
       <div class="sub">Parcela ${b.installment||1} de ${b.installments||1}</div>
     </div>
     <div class="actions">
-      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn danger" onclick="deleteOneBill('${id}')">Só esta</button>
       <button class="btn danger" onclick="deleteBillGroup('${b.groupId}')">Todas</button>
     </div>`);
@@ -1061,11 +1061,11 @@ function delBill(id){
 }
 function deleteOneBill(id){
   db.bills=db.bills.filter(x=>x.id!==id);
-  save();close();life($('lifeMonth')?.value||currentMonth());home();
+  save();closeModal();life($('lifeMonth')?.value||currentMonth());home();
 }
 function deleteBillGroup(groupId){
   db.bills=db.bills.filter(x=>x.groupId!==groupId);
-  save();close();life($('lifeMonth')?.value||currentMonth());home();
+  save();closeModal();life($('lifeMonth')?.value||currentMonth());home();
 }
 function life(sel){
   let month=sel||$('lifeMonth')?.value||currentMonth();
@@ -1149,7 +1149,7 @@ function goalSettings(){
     ${f('Meta semanal','ggw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}
     ${f('Meta mensal','ggm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}
     <div class="actions">
-      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn primary" onclick="saveGoals()">Salvar</button>
     </div>`)
 }
@@ -1157,7 +1157,7 @@ function saveGoals(){
   db.settings.goal=+$('ggd').value||0;
   db.settings.weeklyGoal=+$('ggw').value||0;
   db.settings.monthlyGoal=+$('ggm').value||0;
-  save();close();goals();home();
+  save();closeModal();goals();home();
 }
 
 function stock(){
@@ -1203,7 +1203,7 @@ function newStock(){
     ${f('Custo unitário','spcost','number','0','min="0" step="0.01"')}
     ${f('Preço de venda','spprice','number','0','min="0" step="0.01"')}
     <div class="actions">
-      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn primary" onclick="saveNewStock()">Salvar</button>
     </div>`)
 }
@@ -1214,7 +1214,7 @@ function saveNewStock(){
   let p={id:uid(),name,category:$('spc').value.trim(),qty,min:Math.max(0,+$('spm').value||0),cost:Math.max(0,+$('spcost').value||0),price:Math.max(0,+$('spprice').value||0)};
   db.stock.push(p);
   if(qty>0)db.stockMoves.push({id:uid(),stockId:p.id,type:'in',qty,date:T(),note:'Estoque inicial'});
-  save();close();stock();
+  save();closeModal();stock();
 }
 function editStock(id){
   let p=db.stock.find(x=>x.id===id); if(!p)return;
@@ -1226,7 +1226,7 @@ function editStock(id){
     ${f('Custo unitário','spcost','number',p.cost,'min="0" step="0.01"')}
     ${f('Preço de venda','spprice','number',p.price,'min="0" step="0.01"')}
     <div class="actions">
-      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn primary" onclick="saveEditStock('${id}')">Salvar</button>
     </div>`)
 }
@@ -1236,7 +1236,7 @@ function saveEditStock(id){
   p.name=$('spn').value.trim()||p.name;p.category=$('spc').value.trim();
   p.qty=newQty;p.min=Math.max(0,+$('spm').value||0);p.cost=Math.max(0,+$('spcost').value||0);p.price=Math.max(0,+$('spprice').value||0);
   if(newQty!==oldQty)db.stockMoves.push({id:uid(),stockId:p.id,type:newQty>oldQty?'in':'out',qty:Math.abs(newQty-oldQty),date:T(),note:'Ajuste manual'});
-  save();close();stock();
+  save();closeModal();stock();
 }
 function stockMove(id,type){
   let p=db.stock.find(x=>x.id===id);if(!p)return;
@@ -1246,7 +1246,7 @@ function stockMove(id,type){
     ${f('Observação','smn')}
     ${type==='in'?`<div class="field"><label><input id="smexpense" type="checkbox"> Registrar custo desta entrada como despesa</label></div>`:''}
     <div class="actions">
-      <button class="btn ghost" onclick="close()">Cancelar</button>
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn primary" onclick="saveStockMove('${id}','${type}')">Confirmar</button>
     </div>`)
 }
@@ -1259,7 +1259,7 @@ function saveStockMove(id,type){
   if(type==='in'&&$('smexpense')?.checked&&(+p.cost||0)>0){
     db.tx.push({id:uid(),type:'out',amount:qty*(+p.cost||0),desc:'Compra de estoque: '+p.name,date:T(),cat:'Estoque'});
   }
-  save();close();stock();home();
+  save();closeModal();stock();home();
 }
 function deleteStock(id){
   let p=db.stock.find(x=>x.id===id);if(!p)return;
@@ -1452,7 +1452,7 @@ function drawReportLine(id,data){
   });
   c.fillStyle='#6b7280';c.font='9px system-ui';c.textAlign='center';data.forEach((x,i)=>c.fillText(x.label,xs[i],h-9));
 }
-function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="close();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);close()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();close();head();home();life();if($('goals').classList.contains('active'))goals()}
+function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
 function fabAction(action){
@@ -1465,7 +1465,7 @@ function fabAction(action){
   if(action==='life'){show('life');return}
   if(action==='stock'){show('stock');return}
 }
-$('modal').onclick=e=>{if(e.target.id==='modal')close()};head();home();
+$('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};head();home();
 </script>
 <script>
 /* NEXO 1.8.2 • PWA */
