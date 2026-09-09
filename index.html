@@ -158,6 +158,17 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
 .biz-setup.show{display:flex}.setup-card{width:min(560px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;color:#111827;box-shadow:0 30px 80px #0008}
 .setup-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.setup-brand{font-size:27px;font-weight:900}.setup-brand span{color:#16a34a}.setup-step{font-size:11px;color:#6b7280;font-weight:800}.setup-title{font-size:24px;line-height:1.12;margin:8px 0}.setup-copy{font-size:13px;color:#6b7280;line-height:1.5;margin-bottom:15px}.setup-options{display:grid;gap:9px}.setup-option{width:100%;text-align:left;border:1px solid #e5e7eb;background:#fff;border-radius:16px;padding:13px;display:flex;gap:11px;align-items:center;cursor:pointer}.setup-option.selected{border:2px solid #16a34a;background:#ecfdf5}.setup-option .ico{font-size:24px;width:32px;text-align:center}.setup-option b{display:block}.setup-option small{display:block;color:#6b7280;margin-top:2px}.setup-grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.setup-actions{display:flex;gap:8px;margin-top:18px}.setup-actions button{flex:1}.setup-dots{text-align:center;color:#d1d5db;letter-spacing:5px;margin:14px 0 2px}.setup-dots .on{color:#16a34a}.setup-check{display:flex;gap:9px;align-items:center;border-bottom:1px solid #eee;padding:10px 3px}.setup-check input{width:18px;height:18px;accent-color:#16a34a}.setup-preview{border-radius:18px;padding:16px;background:#111827;color:#fff;margin:10px 0}.setup-preview.beauty{background:linear-gradient(135deg,#632654,#b44398)}.setup-preview.neutral{background:#57534e}.setup-preview.dark{background:#0b1220}.setup-done{text-align:center;padding:12px 2px}.setup-done .done-icon{font-size:48px}.setup-note{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:14px;padding:11px;font-size:12px;margin-top:10px}
 @media(max-width:420px){.setup-card{padding:16px}.setup-title{font-size:21px}.setup-grid2{grid-template-columns:1fr}}
+
+.fab{overflow:hidden;padding:0}
+.fab .fab-nexo-icon{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:50%;
+  pointer-events:none;
+}
+
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -413,7 +424,7 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
 <button onclick="fabAction('life')">Pessoal</button>
 <button onclick="fabAction('stock')">Estoque</button>
 </div>
-<button class="fab" onclick="fab()">+</button><nav class="nav"><button class="active" onclick="show('home',this)"><b>⌂</b>Início</button><button onclick="show('agenda',this)"><b>◷</b>Agenda</button><button onclick="show('clients',this)"><b>♙</b>Clientes</button><button onclick="show('services',this)"><b>✂</b>Serviços</button><button onclick="show('more',this)"><b>☰</b>Mais</button></nav></div>
+<button class="fab" onclick="fab()"><img src="/icons/icon-192.png" alt="NEXO" class="fab-nexo-icon"></button><nav class="nav"><button class="active" onclick="show('home',this)"><b>⌂</b>Início</button><button onclick="show('agenda',this)"><b>◷</b>Agenda</button><button onclick="show('clients',this)"><b>♙</b>Clientes</button><button onclick="show('services',this)"><b>✂</b>Serviços</button><button onclick="show('more',this)"><b>☰</b>Mais</button></nav></div>
 <div class="modal" id="modal"><div class="sheet"><div id="body"></div></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -694,7 +705,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.8.3',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.8.4',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
