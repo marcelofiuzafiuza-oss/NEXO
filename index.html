@@ -431,7 +431,11 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
   <div class="actions"><button class="btn primary" onclick="$('devImportFile').click()">Importar CSV</button><button class="btn ghost" onclick="developerExportCSV()">Exportar CSV</button></div>
 </div>
 <div class="card">
-  <div class="field" style="margin:0"><label>Buscar / filtrar</label><input id="devSearch" class="search" placeholder="Nome, telefone, categoria ou cidade" oninput="renderDeveloper()"></div>
+  <div class="actions" style="margin-bottom:12px">
+    <button class="btn primary" onclick="developerSearchLead()">🔎 Pesquisar nome</button>
+    <button class="btn dark" onclick="developerNewLead()">＋ Adicionar novo</button>
+  </div>
+  <div class="field" style="margin:0"><label>Buscar / filtrar</label><input id="devSearch" class="search" placeholder="Digite nome, telefone, categoria ou cidade" oninput="renderDeveloper()"></div>
   <div class="field"><label>Status</label><select id="devStatusFilter" onchange="renderDeveloper()"><option value="">Todos</option><option value="new">Não contatado</option><option value="contacted">Contatado</option><option value="replied">Respondeu</option><option value="trial">Em teste</option><option value="client">Cliente</option></select></div>
 </div>
 <div class="card" id="devLeadList"><div class="empty">Nenhum lead importado.</div></div>
@@ -458,7 +462,7 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.8.9</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 1.9.0</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -710,7 +714,9 @@ async function pushCloudNow(){
   if(!currentFirebaseUser||applyingCloud)return;
   try{
     const payload=normalizeNexoData(db);
-    await firestore.collection('users').doc(currentFirebaseUser.uid).set({appData:payload,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    const cloudPayload={appData:payload,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(isDeveloperAccount())cloudPayload.developerProspects=Array.isArray(db.prospects)?db.prospects:[];
+    await firestore.collection('users').doc(currentFirebaseUser.uid).set(cloudPayload,{merge:true});
   }catch(err){console.error('NEXO cloud save:',err)}
 }
 function scheduleCloudSave(){
@@ -726,11 +732,17 @@ async function syncCloudOnLogin(){
   let snap=null;
   try{snap=await ref.get({source:'server'})}catch(e){snap=await ref.get()}
   const profile=snap.data()||{},cloudData=profile.appData;
+  if((profile.developer===true||profile.isDeveloper===true||['developer','admin'].includes(String(profile.role||'').toLowerCase()))&&Array.isArray(profile.developerProspects)){
+    db.prospects=profile.developerProspects;
+  }
 
   // O armazenamento local já é exclusivo deste UID.
   // Se houver dados na nuvem, eles são a fonte principal e podem ser combinados
   // apenas com dados locais pertencentes ao MESMO usuário.
   const merged=cloudData?mergeNexoData(cloudData,db):normalizeNexoData(db);
+  if((profile.developer===true||profile.isDeveloper===true||['developer','admin'].includes(String(profile.role||'').toLowerCase()))&&Array.isArray(profile.developerProspects)){
+    merged.prospects=profile.developerProspects;
+  }
   applyingCloud=true;
   db=merged;
   persistLocal();
@@ -738,7 +750,9 @@ async function syncCloudOnLogin(){
   applyingCloud=false;
 
   cloudReady=true;
-  await ref.set({appData:db,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  const initialCloudPayload={appData:db,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+  if(isDeveloperAccount())initialCloudPayload.developerProspects=Array.isArray(db.prospects)?db.prospects:[];
+  await ref.set(initialCloudPayload,{merge:true});
 
   if(cloudUnsubscribe)cloudUnsubscribe();
   cloudUnsubscribe=ref.onSnapshot(doc=>{
@@ -748,6 +762,11 @@ async function syncCloudOnLogin(){
     const remote=profile.appData;
     if(!remote||applyingCloud)return;
     const normalized=normalizeNexoData(remote);
+    if(isDeveloperAccount()&&Array.isArray(profile.developerProspects)){
+      normalized.prospects=profile.developerProspects;
+    }else if(isDeveloperAccount()&&Array.isArray(db.prospects)&&db.prospects.length){
+      normalized.prospects=db.prospects;
+    }
     if(JSON.stringify(normalized)===JSON.stringify(normalizeNexoData(db)))return;
     applyingCloud=true;
     db=normalized;
@@ -852,7 +871,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='1.8.8',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='1.8.9',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -1734,6 +1753,67 @@ function renderDeveloper(){
   });
   $('devLeadList').innerHTML=arr.length?arr.map(x=>`<div class="dev-lead"><div class="row"><div style="min-width:0"><div class="name">${E(x.name||'Sem nome')}</div><div class="sub">${E(x.phone||'Sem telefone')}${x.category?' • '+E(x.category):''}${x.city?' • '+E(x.city):''}</div></div><span class="dev-status">${devStatusLabel(x.status||'new')}</span></div>${x.note?`<div class="sub" style="margin-top:6px">${E(x.note)}</div>`:''}<div class="actions">${x.phone?`<button class="btn primary" onclick="developerWhatsApp('${x.id}')">💬 Apresentar NEXO</button>`:''}<button class="btn ghost" onclick="developerChangeStatus('${x.id}')">Status</button><button class="btn danger" onclick="developerDeleteLead('${x.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum lead encontrado.</div>';
 }
+
+function developerSearchLead(){
+  if(!isDeveloperAccount())return;
+  const current=($('devSearch')?.value||'').trim();
+  const name=prompt('Digite o nome, parte do nome ou telefone do lead:',current);
+  if(name===null)return;
+  if($('devSearch'))$('devSearch').value=name.trim();
+  renderDeveloper();
+  const field=$('devSearch');
+  if(field){field.scrollIntoView({behavior:'smooth',block:'center'});field.focus();field.select()}
+}
+function developerNewLead(){
+  if(!isDeveloperAccount())return;
+  open(`<h3>Adicionar novo lead</h3>
+    ${f('Nome / estabelecimento','dln')}
+    ${f('Telefone / WhatsApp','dlp','tel')}
+    <div class="field"><label>Categoria</label><input id="dlc" type="text" placeholder="Ex.: Barbearia, Nail Designer, Estética"></div>
+    ${f('Cidade','dlcity','text','Sarandi')}
+    <div class="field"><label>Observação</label><textarea id="dlnote" rows="3" placeholder="Ex.: Vi passando em frente ao estabelecimento"></textarea></div>
+    <div class="actions">
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn primary" onclick="developerSaveNewLead()">Salvar lead</button>
+    </div>`);
+}
+function developerSaveNewLead(){
+  if(!isDeveloperAccount())return;
+  const name=($('dln')?.value||'').trim();
+  const phone=($('dlp')?.value||'').trim();
+  const category=($('dlc')?.value||'').trim();
+  const city=($('dlcity')?.value||'').trim();
+  const note=($('dlnote')?.value||'').trim();
+  if(!name)return alert('Informe o nome do profissional ou estabelecimento.');
+  const phoneKey=normalizeLeadPhone(phone);
+  const nameKey=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+  const duplicate=(db.prospects||[]).find(x=>{
+    const xp=normalizeLeadPhone(x.phone);
+    const xn=String(x.name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+    return (phoneKey&&xp===phoneKey)||(nameKey&&xn===nameKey);
+  });
+  if(duplicate){
+    return alert(`Esse lead já está na lista:\n\n${duplicate.name}${duplicate.phone?'\n'+duplicate.phone:''}`);
+  }
+  db.prospects=Array.isArray(db.prospects)?db.prospects:[];
+  db.prospects.unshift({
+    id:uid(),
+    name,
+    phone,
+    category,
+    city,
+    note,
+    status:'new',
+    createdAt:new Date().toISOString()
+  });
+  save();
+  pushCloudNow();
+  closeModal();
+  if($('devSearch'))$('devSearch').value=name;
+  renderDeveloper();
+  alert('Lead adicionado e salvo na nuvem.');
+}
+
 function developerImportCSV(file){
   if(!isDeveloperAccount()||!file)return;
   const r=new FileReader();
@@ -1751,7 +1831,7 @@ function developerImportCSV(file){
       const existing=new Set((db.prospects||[]).map(x=>normalizeLeadPhone(x.phone)).filter(Boolean));
       let added=0,dup=0;
       lines.slice(1).forEach(line=>{const c=parse(line),name=(c[iname]||'').trim(),phone=(c[iphone]||'').trim(),key=normalizeLeadPhone(phone);if(!name)return;if(key&&existing.has(key)){dup++;return}db.prospects.push({id:uid(),name,phone,category:icat>=0?(c[icat]||'').trim():'',city:icity>=0?(c[icity]||'').trim():'',note:inote>=0?(c[inote]||'').trim():'',status:'new',createdAt:new Date().toISOString()});if(key)existing.add(key);added++});
-      save();renderDeveloper();alert(`${added} lead(s) importado(s).${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
+      save();pushCloudNow();renderDeveloper();alert(`${added} lead(s) importado(s) e salvos na nuvem.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
     }catch(e){console.error(e);alert('Não foi possível importar este CSV.');}
     $('devImportFile').value='';
   };
