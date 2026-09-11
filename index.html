@@ -542,21 +542,55 @@ function setAccessLock(kind){
     if(button)button.textContent='Garantir 12 meses de acesso';
   }
 }
+function applyAccessProfile(profile){
+  currentUserProfile=profile||{};
+  if($('accountEmail'))$('accountEmail').textContent=currentFirebaseUser?.email||'';
+  const t=profileTrialState(currentUserProfile);
+  $('trialBanner').classList.add('show');
+  if(t.paid&&t.kind==='annual')$('trialBanner').textContent=`NEXO • Plano anual ativo • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
+  else if(t.paid)$('trialBanner').textContent='NEXO • Acesso ativo';
+  else if(t.expired&&t.kind==='annual')$('trialBanner').textContent='Seu acesso anual terminou.';
+  else if(t.expired)$('trialBanner').textContent='Seu período de teste terminou.';
+  else $('trialBanner').textContent=`Você está no período de teste • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
+
+  if(t.expired&&!t.paid){
+    setAccessLock(t.kind);
+    $('trialLock').classList.add('show');
+    document.body.classList.add('locked-scroll');
+  }else{
+    $('trialLock').classList.remove('show');
+    document.body.classList.remove('locked-scroll');
+  }
+  return t;
+}
 async function checkAccess(){
-  if(!currentFirebaseUser){$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');showAuth();return}
+  if(!currentFirebaseUser){
+    $('trialLock').classList.remove('show');
+    $('trialBanner').classList.remove('show');
+    showAuth();
+    return;
+  }
   try{
-    currentUserProfile=await createUserProfileIfNeeded(currentFirebaseUser);
-    if($('accountEmail'))$('accountEmail').textContent=currentFirebaseUser.email||'';
-    const t=profileTrialState(currentUserProfile);
-    $('trialBanner').classList.add('show');
-    if(t.paid&&t.kind==='annual')$('trialBanner').textContent=`NEXO • Plano anual ativo • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
-    else if(t.paid)$('trialBanner').textContent='NEXO • Acesso ativo';
-    else if(t.expired&&t.kind==='annual')$('trialBanner').textContent='Seu acesso anual terminou.';
-    else if(t.expired)$('trialBanner').textContent='Seu período de teste terminou.';
-    else $('trialBanner').textContent=`Você está no período de teste • ${t.daysLeft} ${t.daysLeft===1?'dia restante':'dias restantes'}`;
-    if(t.expired&&!t.paid){setAccessLock(t.kind);$('trialLock').classList.add('show');document.body.classList.add('locked-scroll')}
-    else{$('trialLock').classList.remove('show');document.body.classList.remove('locked-scroll')}
-  }catch(err){console.error(err);authMessage('Não foi possível validar seu acesso no Firebase.');showAuth()}
+    const ref=firestore.collection('users').doc(currentFirebaseUser.uid);
+    let snap=null;
+    try{
+      // Força leitura do servidor para refletir ativações manuais feitas no Firebase.
+      snap=await ref.get({source:'server'});
+    }catch(serverErr){
+      console.warn('NEXO acesso: usando cache por indisponibilidade do servidor.',serverErr);
+      snap=await ref.get();
+    }
+    if(!snap.exists){
+      currentUserProfile=await createUserProfileIfNeeded(currentFirebaseUser);
+    }else{
+      currentUserProfile=snap.data()||{};
+    }
+    applyAccessProfile(currentUserProfile);
+  }catch(err){
+    console.error(err);
+    authMessage('Não foi possível validar seu acesso no Firebase.');
+    showAuth();
+  }
 }
 async function createAccount(){
   const name=$('signupName').value.trim(),email=$('signupEmail').value.trim().toLowerCase(),p=$('signupPass').value,p2=$('signupPass2').value;
@@ -626,10 +660,20 @@ async function syncCloudOnLogin(){
   await ref.set({appData:db,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
   if(cloudUnsubscribe)cloudUnsubscribe();
   cloudUnsubscribe=ref.onSnapshot(doc=>{
-    const remote=doc.data()?.appData;if(!remote||applyingCloud)return;
+    const profile=doc.data()||{};
+    // Atualiza também o estado comercial (trial/active/annual) em tempo real.
+    if(currentFirebaseUser)applyAccessProfile(profile);
+
+    const remote=profile.appData;
+    if(!remote||applyingCloud)return;
     const normalized=normalizeNexoData(remote);
     if(JSON.stringify(normalized)===JSON.stringify(normalizeNexoData(db)))return;
-    applyingCloud=true;db=normalized;localStorage.setItem(K,JSON.stringify(db));applyTheme(db.settings.theme);applyingCloud=false;rerenderCurrentScreen();
+    applyingCloud=true;
+    db=normalized;
+    localStorage.setItem(K,JSON.stringify(db));
+    applyTheme(db.settings.theme);
+    applyingCloud=false;
+    rerenderCurrentScreen();
   },err=>console.error('NEXO cloud listener:',err));
 }
 
@@ -699,13 +743,13 @@ async function bootNexo(){
 
   auth.onAuthStateChanged(async user=>{
     currentFirebaseUser=user||null;currentUserProfile=null;
-    if(user){hideAuth();try{await checkAccess();await syncCloudOnLogin();applyBrandTheme();if(typeof head==='function')head();if(typeof home==='function')home();if(currentUserProfile?.needsBusinessSetup===true)setupOpen()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
+    if(user){hideAuth();try{await checkAccess();await syncCloudOnLogin();await checkAccess();applyBrandTheme();if(typeof head==='function')head();if(typeof home==='function')home();if(currentUserProfile?.needsBusinessSetup===true)setupOpen()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
     else{$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');toggleAuth('login');showAuth()}
   });
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.8.4',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K='NEXO13',NEXO_APP_VERSION='1.8.6',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -861,6 +905,7 @@ function clientMessageMenu(id){
     <div class="item"><div class="name">🎂 Aniversário</div><div class="sub">Mensagem de felicitação pronta para enviar.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappBirthday('${c.id}')">Preparar parabéns</button></div>
     <div class="item"><div class="name">💖 Agradecimento</div><div class="sub">Uma mensagem de carinho depois do atendimento.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappThankClient('${c.id}')">Preparar agradecimento</button></div>
     <div class="item"><div class="name">📣 Novidade / promoção</div><div class="sub">Convide o cliente para conhecer uma novidade ou condição especial.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="whatsappPromotion('${c.id}')">Preparar mensagem</button></div>
+    <div class="item"><div class="name">🚀 Apresentar o NEXO</div><div class="sub">Mostre ao profissional, pelo próprio WhatsApp, como o NEXO pode ajudar no relacionamento com os clientes e na gestão do negócio.</div><button class="btn primary" style="width:100%;margin-top:9px" onclick="chooseNexoPresentation('${c.id}')">Apresentar o NEXO</button></div>
     <button class="btn ghost" style="width:100%;margin-top:14px" onclick="closeModal()">Fechar</button>`);
 }
 function whatsappClient(id){clientMessageMenu(id)}
@@ -904,6 +949,64 @@ function whatsappBirthday(id){
 function whatsappThankClient(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   openWhatsApp(c.phone,whatsappProfile().thanks(c));
+}
+function chooseNexoPresentation(id){
+  const c=db.clients.find(x=>x.id===id);if(!c)return;
+  open(`<h3>🚀 Apresentar o NEXO</h3>
+    <div class="sub" style="margin:-3px 0 14px">Escolha para qual público você vai enviar. O NEXO adapta a linguagem da apresentação antes de abrir o WhatsApp.</div>
+    <div class="item">
+      <div class="name">💈 Público masculino</div>
+      <div class="sub">Texto direcionado a barbeiros e negócios com comunicação mais masculina.</div>
+      <button class="btn primary" style="width:100%;margin-top:9px" onclick="whatsappPresentNexo('${c.id}','male')">Preparar mensagem masculina</button>
+    </div>
+    <div class="item">
+      <div class="name">✨ Público feminino</div>
+      <div class="sub">Texto direcionado a manicures, nail designers, salões, estética e outros profissionais da beleza.</div>
+      <button class="btn primary" style="width:100%;margin-top:9px" onclick="whatsappPresentNexo('${c.id}','female')">Preparar mensagem feminina</button>
+    </div>
+    <button class="btn ghost" style="width:100%;margin-top:14px" onclick="closeModal()">Cancelar</button>`);
+}
+function whatsappPresentNexo(id,audience='male'){
+  const c=db.clients.find(x=>x.id===id);if(!c)return;
+  const first=String(c.name||'').trim().split(/\s+/)[0]||'';
+  const female=audience==='female';
+  const greeting=first
+    ? (female?`Oi, ${first}! Tudo bem? ✨`:`Fala, ${first}! Tudo certo? 👋`)
+    : (female?'Oi! Tudo bem? ✨':'Olá! Tudo certo? 👋');
+
+  const intro=female
+    ? `Essa mensagem que você acabou de receber é um exemplo de uma das mensagens que as suas próprias clientes podem receber através do NEXO.`
+    : `Essa mensagem que você acabou de receber é um exemplo de uma das mensagens que os seus próprios clientes podem receber através do NEXO.`;
+
+  const positioning=female
+    ? `Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de manicures, nail designers, profissionais de cabelo, sobrancelhas, cílios, estética e outros negócios da beleza.`
+    : `Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de barbeiros e profissionais que vivem do atendimento ao cliente.`;
+
+  const relationship=female
+    ? `Dentro do NEXO você cadastra suas clientes e consegue preparar mensagens pelo WhatsApp para confirmar horários, lembrar agendamentos, avisar horários disponíveis, oferecer encaixes, lembrar aniversários, agradecer pelo atendimento e chamar quem já está há algum tempo sem voltar.`
+    : `Dentro do NEXO você cadastra seus clientes e consegue preparar mensagens pelo WhatsApp para confirmar horários, lembrar agendamentos, avisar horários disponíveis, oferecer encaixes, lembrar aniversários, agradecer pelo atendimento e chamar quem já está há algum tempo sem voltar.`;
+
+  const ending=female
+    ? `A ideia é simples: enquanto você cuida das suas clientes e do seu trabalho, o NEXO ajuda você a cuidar do seu negócio. ✨`
+    : `A ideia é simples: enquanto você cuida dos seus clientes e do seu trabalho, o NEXO ajuda você a cuidar do seu negócio. 💈`;
+
+  const msg=`${greeting}
+
+${intro}
+
+${positioning}
+
+${relationship}
+
+E isso é só uma parte. O NEXO também reúne agenda, cadastro de clientes, serviços, faturamento, despesas, metas, estoque, relatórios e organização financeira pessoal em um único lugar.
+
+Você pode conhecer e testar tudo GRÁTIS por 7 dias, sem cartão e sem compromisso.
+
+👉 https://nexo-site-eosin.vercel.app/
+
+${ending}`;
+
+  openWhatsApp(c.phone,msg);
 }
 function whatsappPromotion(id){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
@@ -1479,7 +1582,7 @@ function fabAction(action){
 $('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};head();home();
 </script>
 <script>
-/* NEXO 1.8.2 • PWA */
+/* NEXO 1.8.6 • PWA */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
