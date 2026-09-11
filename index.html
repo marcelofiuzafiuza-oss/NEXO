@@ -418,6 +418,12 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
 <section id="developer" class="screen">
 <div class="section"><h2>Área do desenvolvedor</h2><span class="badge green">Privado</span></div>
 <div class="notice">Central interna do NEXO. Esta área só aparece em contas autorizadas no Firebase.</div>
+<div class="card" style="margin-top:10px">
+  <div class="row">
+    <div><b>Sincronização da prospecção</b><div class="sub" id="devCloudStatus">Verificando Firebase...</div></div>
+    <button class="btn ghost" onclick="ensureDeveloperProspectsLoaded().then(()=>renderDeveloper())">↻ Recarregar</button>
+  </div>
+</div>
 <div class="grid" style="margin-top:12px">
   <div class="metric"><div class="small">Leads</div><div class="value" id="devLeadTotal">0</div></div>
   <div class="metric"><div class="small">Não contatados</div><div class="value" id="devLeadNew">0</div></div>
@@ -462,7 +468,7 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.9.1</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 1.9.2</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -871,6 +877,7 @@ async function bootNexo(){
         await checkAccess();
         await syncCloudOnLogin();
         await checkAccess();
+        if(isDeveloperAccount())await ensureDeveloperProspectsLoaded();
         applyBrandTheme();
         if(typeof head==='function')head();
         if(typeof home==='function')home();
@@ -1788,9 +1795,45 @@ function updateDeveloperUI(){
   if(entry)entry.classList.toggle('dev-visible',isDeveloperAccount());
   if(!isDeveloperAccount()&&$('developer')?.classList.contains('active'))show('more');
 }
-function showDeveloper(){
+async function ensureDeveloperProspectsLoaded(){
+  if(!currentFirebaseUser||!isDeveloperAccount())return false;
+  try{
+    const snap=await firestore.collection('users').doc(currentFirebaseUser.uid).get({source:'server'});
+    const p=snap.data()||{};
+    const cloudList=Array.isArray(p.developerProspects)?p.developerProspects:[];
+    const appList=Array.isArray(p.appData?.prospects)?p.appData.prospects:[];
+    const localList=loadDeveloperProspectsLocal(currentFirebaseUser.uid);
+    const merged=mergeProspectsPreferNewest(
+      cloudList,
+      appList,
+      localList,
+      Array.isArray(db.prospects)?db.prospects:[]
+    );
+    if(merged.length){
+      db.prospects=merged;
+      persistDeveloperProspects();
+      persistLocal();
+    }
+    const status=$('devCloudStatus');
+    if(status)status.textContent=`Firebase: ${cloudList.length||appList.length} lead(s) • aparelho: ${localList.length} • carregados: ${merged.length}`;
+    return true;
+  }catch(err){
+    console.error('NEXO prospecção: falha ao restaurar do Firebase',err);
+    const localList=loadDeveloperProspectsLocal(currentFirebaseUser.uid);
+    if(localList.length){
+      db.prospects=mergeProspectsPreferNewest(localList,Array.isArray(db.prospects)?db.prospects:[]);
+      persistLocal();
+    }
+    const status=$('devCloudStatus');
+    if(status)status.textContent=`Sem conexão com Firebase • backup do aparelho: ${localList.length}`;
+    return false;
+  }
+}
+async function showDeveloper(){
   if(!isDeveloperAccount())return alert('Acesso restrito ao desenvolvedor.');
   show('developer');
+  await ensureDeveloperProspectsLoaded();
+  renderDeveloper();
 }
 function devStatusLabel(s){return ({new:'Não contatado',contacted:'Contatado',replied:'Respondeu',trial:'Em teste',client:'Cliente'})[s]||'Não contatado'}
 function normalizeLeadPhone(v){return normalizePhoneBR(v||'')}
@@ -1891,10 +1934,22 @@ function developerImportCSV(file){
       save();
       persistDeveloperProspects();
       const cloudOk=await pushCloudNow();
+      let confirmed=false,serverCount=0;
+      if(cloudOk){
+        try{
+          const verify=await firestore.collection('users').doc(currentFirebaseUser.uid).get({source:'server'});
+          const vp=verify.data()||{};
+          const vl=Array.isArray(vp.developerProspects)?vp.developerProspects:(Array.isArray(vp.appData?.prospects)?vp.appData.prospects:[]);
+          serverCount=vl.length;
+          confirmed=serverCount>0||added===0;
+        }catch(e){console.warn('Verificação pós-importação:',e)}
+      }
       renderDeveloper();
-      alert(cloudOk
-        ? `${added} lead(s) importado(s) e salvos no Firebase.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`
-        : `${added} lead(s) importado(s) e salvos neste aparelho, mas o Firebase não confirmou a gravação agora.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
+      const status=$('devCloudStatus');
+      if(status)status.textContent=`Firebase: ${serverCount} lead(s) • carregados: ${(db.prospects||[]).length}`;
+      alert(confirmed
+        ? `${added} lead(s) importado(s). Confirmado no Firebase: ${serverCount} lead(s).${dup?` ${dup} duplicado(s) ignorado(s).`:''}`
+        : `${added} lead(s) importado(s), mas não consegui confirmar a lista no servidor. O backup deste aparelho foi mantido.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
     }catch(e){console.error(e);alert('Não foi possível importar este CSV.');}
     $('devImportFile').value='';
   };
