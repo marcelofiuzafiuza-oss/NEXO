@@ -169,6 +169,16 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
   pointer-events:none;
 }
 
+/* ===== NEXO • ÁREA DO DESENVOLVEDOR ===== */
+.dev-only{display:none!important}
+.dev-only.dev-visible{display:block!important}
+.dev-toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.dev-stat{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:13px}
+.dev-stat .value{font-size:22px;font-weight:900;margin-top:4px}
+.dev-lead{padding:13px 0;border-bottom:1px solid #e5e7eb}.dev-lead:last-child{border-bottom:0}
+.dev-status{font-size:10px;font-weight:800;padding:5px 8px;border-radius:999px;background:#f3f4f6;color:#374151}
+body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
+
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -405,7 +415,31 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
 <div class="card" id="repInsights"></div>
 </section>
 
-<section id="more" class="screen"><div class="section"><h2>Mais</h2></div><div class="card"><div class="row"><div><b>Financeiro</b><div class="sub">Receitas, despesas e resultado</div></div><button class="btn ghost" onclick="show('finance')">Abrir</button></div><hr><div class="row"><div><b>Minha Vida</b><div class="sub">Contas pessoais e necessidade diária</div></div><button class="btn ghost" onclick="show('life')">Abrir</button></div><hr><div class="row"><div><b>Metas</b><div class="sub">Metas diária, semanal e mensal</div></div><button class="btn ghost" onclick="show('goals')">Abrir</button></div><hr><div class="row"><div><b>Estoque</b><div class="sub">Produtos, entradas, saídas e alertas</div></div><button class="btn ghost" onclick="show('stock')">Abrir</button></div><hr><div class="row"><div><b>Relatórios</b><div class="sub">Resumo financeiro e desempenho</div></div><button class="btn ghost" onclick="show('reports')">Abrir</button></div><hr><div class="row"><div><b>Configurações</b><div class="sub">Negócio, metas e dias de trabalho</div></div><button class="btn dark" onclick="settings()">Configurar</button></div></div><div class="card">
+<section id="developer" class="screen">
+<div class="section"><h2>Área do desenvolvedor</h2><span class="badge green">Privado</span></div>
+<div class="notice">Central interna do NEXO. Esta área só aparece em contas autorizadas no Firebase.</div>
+<div class="grid" style="margin-top:12px">
+  <div class="metric"><div class="small">Leads</div><div class="value" id="devLeadTotal">0</div></div>
+  <div class="metric"><div class="small">Não contatados</div><div class="value" id="devLeadNew">0</div></div>
+  <div class="metric"><div class="small">Contatados</div><div class="value" id="devLeadContacted">0</div></div>
+  <div class="metric"><div class="small">Em teste / cliente</div><div class="value" id="devLeadConverted">0</div></div>
+</div>
+<div class="card">
+  <div class="name">Importar prospecção</div>
+  <div class="sub" style="margin:4px 0 10px">Importe CSV com colunas nome, telefone, categoria, cidade e observação. Telefones repetidos são ignorados.</div>
+  <input id="devImportFile" type="file" accept=".csv,text/csv" style="display:none" onchange="developerImportCSV(this.files[0])">
+  <div class="actions"><button class="btn primary" onclick="$('devImportFile').click()">Importar CSV</button><button class="btn ghost" onclick="developerExportCSV()">Exportar CSV</button></div>
+</div>
+<div class="card">
+  <div class="field" style="margin:0"><label>Buscar / filtrar</label><input id="devSearch" class="search" placeholder="Nome, telefone, categoria ou cidade" oninput="renderDeveloper()"></div>
+  <div class="field"><label>Status</label><select id="devStatusFilter" onchange="renderDeveloper()"><option value="">Todos</option><option value="new">Não contatado</option><option value="contacted">Contatado</option><option value="replied">Respondeu</option><option value="trial">Em teste</option><option value="client">Cliente</option></select></div>
+</div>
+<div class="card" id="devLeadList"><div class="empty">Nenhum lead importado.</div></div>
+</section>
+<section id="more" class="screen"><div class="section"><h2>Mais</h2></div><div class="card"><div class="row"><div><b>Financeiro</b><div class="sub">Receitas, despesas e resultado</div></div><button class="btn ghost" onclick="show('finance')">Abrir</button></div><hr><div class="row"><div><b>Minha Vida</b><div class="sub">Contas pessoais e necessidade diária</div></div><button class="btn ghost" onclick="show('life')">Abrir</button></div><hr><div class="row"><div><b>Metas</b><div class="sub">Metas diária, semanal e mensal</div></div><button class="btn ghost" onclick="show('goals')">Abrir</button></div><hr><div class="row"><div><b>Estoque</b><div class="sub">Produtos, entradas, saídas e alertas</div></div><button class="btn ghost" onclick="show('stock')">Abrir</button></div><hr><div class="row"><div><b>Relatórios</b><div class="sub">Resumo financeiro e desempenho</div></div><button class="btn ghost" onclick="show('reports')">Abrir</button></div><hr><div class="row"><div><b>Configurações</b><div class="sub">Negócio, metas e dias de trabalho</div></div><button class="btn dark" onclick="settings()">Configurar</button></div></div><div class="card dev-only" id="developerEntry">
+  <div class="row"><div><b>🛠️ Área do desenvolvedor</b><div class="sub">Prospecção, importação de leads e ferramentas internas</div></div><button class="btn dark" onclick="showDeveloper()">Abrir</button></div>
+</div>
+<div class="card">
   <div class="row">
     <div>
       <b>Conta</b>
@@ -424,7 +458,7 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.8.8</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 1.8.9</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -566,6 +600,7 @@ function setAccessLock(kind){
 }
 function applyAccessProfile(profile){
   currentUserProfile=profile||{};
+  updateDeveloperUI();
   if($('accountEmail'))$('accountEmail').textContent=currentFirebaseUser?.email||'';
   const t=profileTrialState(currentUserProfile);
   $('trialBanner').classList.add('show');
@@ -648,15 +683,15 @@ function contactNexoSupport(){openWhatsApp('44920013836','Olá! Preciso falar co
 /* ===== NEXO 1.7 — NUVEM + RELACIONAMENTO ===== */
 let cloudSyncTimer=null, cloudUnsubscribe=null, applyingCloud=false, cloudReady=false;
 function normalizeNexoData(data){
-  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
+  const base={settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[],prospects:[]};
   const x=(data&&typeof data==='object')?JSON.parse(JSON.stringify(data)):base;
   x.settings={...base.settings,...(x.settings||{})};
-  ['clients','services','appointments','tx','bills','stock','stockMoves'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});
+  ['clients','services','appointments','tx','bills','stock','stockMoves','prospects'].forEach(k=>{if(!Array.isArray(x[k]))x[k]=[]});
   x.clients=x.clients.map(c=>({...c,birthday:c.birthday||''}));
   x.services=x.services.map(s=>({...s,returnDays:Number.isFinite(+s.returnDays)?+s.returnDays:20}));
   return x;
 }
-function dataHasContent(x){return ['clients','services','appointments','tx','bills','stock','stockMoves'].some(k=>(x?.[k]||[]).length>0)||((x?.settings?.business||'')&&x.settings.business!=='Minha Barbearia')}
+function dataHasContent(x){return ['clients','services','appointments','tx','bills','stock','stockMoves','prospects'].some(k=>(x?.[k]||[]).length>0)||((x?.settings?.business||'')&&x.settings.business!=='Minha Barbearia')}
 function mergeById(cloudArr=[],localArr=[]){
   const map=new Map();
   cloudArr.forEach((v,i)=>map.set(v?.id||('cloud-'+i),v));
@@ -668,7 +703,7 @@ function mergeNexoData(cloudData,localData){
   if(!dataHasContent(c)&&dataHasContent(l))return l;
   if(dataHasContent(c)&&!dataHasContent(l))return c;
   const out=normalizeNexoData(c);
-  ['clients','services','appointments','tx','bills','stock','stockMoves'].forEach(k=>out[k]=mergeById(c[k],l[k]));
+  ['clients','services','appointments','tx','bills','stock','stockMoves','prospects'].forEach(k=>out[k]=mergeById(c[k],l[k]));
   return out;
 }
 async function pushCloudNow(){
@@ -683,7 +718,7 @@ function scheduleCloudSave(){
   clearTimeout(cloudSyncTimer);cloudSyncTimer=setTimeout(pushCloudNow,450);
 }
 function rerenderCurrentScreen(){
-  try{head();const a=document.querySelector('.screen.active');if(!a)return;const id=a.id;if(id==='home')home();else if(id==='agenda')agenda();else if(id==='clients')renderClients();else if(id==='services')renderServices();else if(id==='finance')finance();else if(id==='life')life($('lifeMonth')?.value||currentMonth());else if(id==='goals')goals();else if(id==='stock')stock();else if(id==='reports')reports()}catch(e){console.error(e)}
+  try{head();const a=document.querySelector('.screen.active');if(!a)return;const id=a.id;if(id==='home')home();else if(id==='agenda')agenda();else if(id==='clients')renderClients();else if(id==='services')renderServices();else if(id==='finance')finance();else if(id==='life')life($('lifeMonth')?.value||currentMonth());else if(id==='goals')goals();else if(id==='stock')stock();else if(id==='reports')reports();if(id==='developer')renderDeveloper()}catch(e){console.error(e)}
 }
 async function syncCloudOnLogin(){
   if(!currentFirebaseUser)return;
@@ -1668,6 +1703,85 @@ function drawReportLine(id,data){
   });
   c.fillStyle='#6b7280';c.font='9px system-ui';c.textAlign='center';data.forEach((x,i)=>c.fillText(x.label,xs[i],h-9));
 }
+function isDeveloperAccount(){
+  const p=currentUserProfile||{};
+  const role=String(p.role||'').toLowerCase();
+  return p.developer===true||p.isDeveloper===true||role==='developer'||role==='admin';
+}
+function updateDeveloperUI(){
+  const entry=$('developerEntry');
+  if(entry)entry.classList.toggle('dev-visible',isDeveloperAccount());
+  if(!isDeveloperAccount()&&$('developer')?.classList.contains('active'))show('more');
+}
+function showDeveloper(){
+  if(!isDeveloperAccount())return alert('Acesso restrito ao desenvolvedor.');
+  show('developer');
+}
+function devStatusLabel(s){return ({new:'Não contatado',contacted:'Contatado',replied:'Respondeu',trial:'Em teste',client:'Cliente'})[s]||'Não contatado'}
+function normalizeLeadPhone(v){return normalizePhoneBR(v||'')}
+function renderDeveloper(){
+  if(!isDeveloperAccount())return;
+  db.prospects=Array.isArray(db.prospects)?db.prospects:[];
+  const q=($('devSearch')?.value||'').trim().toLowerCase(),status=$('devStatusFilter')?.value||'';
+  const all=db.prospects;
+  $('devLeadTotal').textContent=all.length;
+  $('devLeadNew').textContent=all.filter(x=>(x.status||'new')==='new').length;
+  $('devLeadContacted').textContent=all.filter(x=>['contacted','replied'].includes(x.status)).length;
+  $('devLeadConverted').textContent=all.filter(x=>['trial','client'].includes(x.status)).length;
+  const arr=all.filter(x=>{
+    const hay=[x.name,x.phone,x.category,x.city,x.note].join(' ').toLowerCase();
+    return (!q||hay.includes(q))&&(!status||(x.status||'new')===status);
+  });
+  $('devLeadList').innerHTML=arr.length?arr.map(x=>`<div class="dev-lead"><div class="row"><div style="min-width:0"><div class="name">${E(x.name||'Sem nome')}</div><div class="sub">${E(x.phone||'Sem telefone')}${x.category?' • '+E(x.category):''}${x.city?' • '+E(x.city):''}</div></div><span class="dev-status">${devStatusLabel(x.status||'new')}</span></div>${x.note?`<div class="sub" style="margin-top:6px">${E(x.note)}</div>`:''}<div class="actions">${x.phone?`<button class="btn primary" onclick="developerWhatsApp('${x.id}')">💬 Apresentar NEXO</button>`:''}<button class="btn ghost" onclick="developerChangeStatus('${x.id}')">Status</button><button class="btn danger" onclick="developerDeleteLead('${x.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum lead encontrado.</div>';
+}
+function developerImportCSV(file){
+  if(!isDeveloperAccount()||!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const text=String(r.result||'').replace(/^\uFEFF/,'');
+      const lines=text.split(/\r?\n/).filter(x=>x.trim());
+      if(lines.length<2)return alert('O CSV está vazio ou sem registros.');
+      const sep=(lines[0].split(';').length>lines[0].split(',').length)?';':',';
+      const parse=line=>{let out=[],cur='',q=false;for(let i=0;i<line.length;i++){let ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===sep&&!q){out.push(cur);cur=''}else cur+=ch}out.push(cur);return out.map(x=>x.trim())};
+      const head=parse(lines[0]).map(x=>x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+      const idx=n=>head.findIndex(h=>h===n||h.includes(n));
+      const iname=idx('nome'),iphone=Math.max(idx('telefone'),idx('whatsapp')),icat=idx('categoria'),icity=idx('cidade'),inote=Math.max(idx('observacao'),idx('obs'));
+      if(iname<0||iphone<0)return alert('O CSV precisa ter pelo menos as colunas nome e telefone.');
+      const existing=new Set((db.prospects||[]).map(x=>normalizeLeadPhone(x.phone)).filter(Boolean));
+      let added=0,dup=0;
+      lines.slice(1).forEach(line=>{const c=parse(line),name=(c[iname]||'').trim(),phone=(c[iphone]||'').trim(),key=normalizeLeadPhone(phone);if(!name)return;if(key&&existing.has(key)){dup++;return}db.prospects.push({id:uid(),name,phone,category:icat>=0?(c[icat]||'').trim():'',city:icity>=0?(c[icity]||'').trim():'',note:inote>=0?(c[inote]||'').trim():'',status:'new',createdAt:new Date().toISOString()});if(key)existing.add(key);added++});
+      save();renderDeveloper();alert(`${added} lead(s) importado(s).${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
+    }catch(e){console.error(e);alert('Não foi possível importar este CSV.');}
+    $('devImportFile').value='';
+  };
+  r.readAsText(file,'UTF-8');
+}
+function developerExportCSV(){
+  if(!isDeveloperAccount())return;
+  const rows=[['nome','telefone','categoria','cidade','observacao','status'],...(db.prospects||[]).map(x=>[x.name,x.phone,x.category,x.city,x.note,x.status])];
+  const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nexo_prospeccao.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function developerWhatsApp(id){
+  const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
+  const full=String(x.name||'').trim();
+  const female=/nail|lash|unha|manicure|sobrancelha|est[eé]tica|sal[aã]o|cabelo|massagem|podologia|depila/i.test(String(x.category||''));
+  const greeting=full?(female?`Oi, ${full}! Tudo bem? ✨`:`Fala, ${full}! Tudo certo? 👋`):(female?'Oi! Tudo bem? ✨':'Olá! Tudo certo? 👋');
+  const intro=female?'Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de profissionais da beleza, estética e atendimento.':'Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de barbeiros e profissionais que vivem do atendimento ao cliente.';
+  const msg=`${greeting}\n\n${intro}\n\nO NEXO reúne agenda, clientes, financeiro do negócio, controle pessoal, metas, estoque, relatórios e mensagens pelo WhatsApp em um só lugar.\n\nVocê pode testar gratuitamente por 7 dias, sem cartão e sem compromisso.`;
+  x.status=x.status==='new'?'contacted':x.status||'contacted';x.lastContactAt=new Date().toISOString();save();renderDeveloper();openWhatsApp(x.phone,msg);
+}
+function developerChangeStatus(id){
+  const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
+  const opts=['new','contacted','replied','trial','client'];
+  const current=opts.indexOf(x.status||'new');
+  const labels=opts.map((s,i)=>`${i+1} - ${devStatusLabel(s)}`).join('\n');
+  const n=Number(prompt(`Escolha o status:\n${labels}`,String(current+1)));
+  if(!n||n<1||n>opts.length)return;x.status=opts[n-1];save();renderDeveloper();
+}
+function developerDeleteLead(id){if(!isDeveloperAccount())return;const x=(db.prospects||[]).find(v=>v.id===id);if(x&&confirm('Excluir '+x.name+' da prospecção?')){db.prospects=db.prospects.filter(v=>v.id!==id);save();renderDeveloper()}}
+
 function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
