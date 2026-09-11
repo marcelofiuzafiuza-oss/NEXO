@@ -1070,7 +1070,7 @@ function chooseNexoPresentation(id){
 }
 function whatsappPresentNexo(id,audience='male'){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
-  const first=String(c.name||'').trim().split(/\s+/)[0]||'';
+  const first=String(c.name||'').trim();
   const female=audience==='female';
   const greeting=first
     ? (female?`Oi, ${first}! Tudo bem? ✨`:`Fala, ${first}! Tudo certo? 👋`)
