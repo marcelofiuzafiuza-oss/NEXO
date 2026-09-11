@@ -1766,10 +1766,18 @@ function developerExportCSV(){
 function developerWhatsApp(id){
   const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
   const full=String(x.name||'').trim();
-  const female=/nail|lash|unha|manicure|sobrancelha|est[eé]tica|sal[aã]o|cabelo|massagem|podologia|depila/i.test(String(x.category||''));
+  const female=/nail|lash|unha|manicure|sobrancelha|est[eé]tica|sal[aã]o|cabelo|massagem|massoterapia|podologia|depila|micropigment|spa|beleza/i.test(String(x.category||''));
   const greeting=full?(female?`Oi, ${full}! Tudo bem? ✨`:`Fala, ${full}! Tudo certo? 👋`):(female?'Oi! Tudo bem? ✨':'Olá! Tudo certo? 👋');
-  const intro=female?'Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de profissionais da beleza, estética e atendimento.':'Eu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de barbeiros e profissionais que vivem do atendimento ao cliente.';
-  const msg=`${greeting}\n\n${intro}\n\nO NEXO reúne agenda, clientes, financeiro do negócio, controle pessoal, metas, estoque, relatórios e mensagens pelo WhatsApp em um só lugar.\n\nVocê pode testar gratuitamente por 7 dias, sem cartão e sem compromisso.`;
+  const intro=female
+    ? `Essa mensagem que você acabou de receber é um exemplo de uma das mensagens que as suas próprias clientes podem receber através do NEXO.\n\nEu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de manicures, nail designers, profissionais de cabelo, sobrancelhas, cílios, estética e outros negócios da beleza.`
+    : `Essa mensagem que você acabou de receber é um exemplo de uma das mensagens que os seus próprios clientes podem receber através do NEXO.\n\nEu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de barbeiros e profissionais que vivem do atendimento ao cliente.`;
+  const relationship=female
+    ? `Dentro do NEXO você cadastra suas clientes e consegue preparar mensagens pelo WhatsApp para confirmar horários, lembrar agendamentos, avisar horários disponíveis, oferecer encaixes, lembrar aniversários, agradecer pelo atendimento e chamar quem já está há algum tempo sem voltar.`
+    : `Dentro do NEXO você cadastra seus clientes e consegue preparar mensagens pelo WhatsApp para confirmar horários, lembrar agendamentos, avisar horários disponíveis, oferecer encaixes, lembrar aniversários, agradecer pelo atendimento e chamar quem já está há algum tempo sem voltar.`;
+  const ending=female
+    ? `A ideia é simples: enquanto você cuida das suas clientes e do seu trabalho, o NEXO ajuda você a cuidar do seu negócio. ✨`
+    : `A ideia é simples: enquanto você cuida dos seus clientes e do seu trabalho, o NEXO ajuda você a cuidar do seu negócio. 💈`;
+  const msg=`${greeting}\n\n${intro}\n\n${relationship}\n\nE isso é só uma parte. O NEXO também reúne agenda, cadastro de clientes, serviços, faturamento, despesas, metas, estoque, relatórios e organização financeira pessoal em um único lugar.\n\nVocê pode conhecer e testar tudo GRÁTIS por 7 dias, sem cartão e sem compromisso.\n\n👉 https://nexo-site-eosin.vercel.app/\n\n${ending}`;
   x.status=x.status==='new'?'contacted':x.status||'contacted';x.lastContactAt=new Date().toISOString();save();renderDeveloper();openWhatsApp(x.phone,msg);
 }
 function developerChangeStatus(id){
