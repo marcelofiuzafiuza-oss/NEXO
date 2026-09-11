@@ -414,7 +414,17 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
     <button class="btn danger" onclick="logoutNexo()">Sair</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.7.3 — Responsivo</b><div class="sub">Todos os recursos da 1.7.2 + layout adaptável para celular, tablet e tela dividida</div></div></section>
+<div class="card">
+  <div class="row">
+    <div>
+      <b>💬 Fale com a equipe NEXO</b>
+      <div class="sub">Dúvidas, suporte ou ajuda com o aplicativo</div>
+      <div class="sub" style="margin-top:4px">(44) 92001-3836</div>
+    </div>
+    <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
+  </div>
+</div>
+<div class="card"><b>NEXO 1.8.8</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -511,19 +521,31 @@ function firebaseTimeMs(ts){
   return null;
 }
 function profileTrialState(profile){
-  const status=String(profile?.subscriptionStatus||'trial').toLowerCase();
-  const plan=String(profile?.plan||'trial').toLowerCase();
-  const paid=['active','paid','subscribed'].includes(status);
-  if(paid){
-    const expiresMs=firebaseTimeMs(profile?.accessExpiresAt);
+  const status=String(profile?.subscriptionStatus||'trial').trim().toLowerCase();
+  const plan=String(profile?.plan||'trial').trim().toLowerCase();
+  const expiresMs=firebaseTimeMs(profile?.accessExpiresAt);
+  const activeStatus=['active','paid','subscribed'].includes(status);
+  const annualPlan=['annual','anual','yearly'].includes(plan);
+
+  // Regra principal do plano anual:
+  // se o plano é anual e existe validade futura, o acesso está liberado,
+  // mesmo que o campo subscriptionStatus esteja atrasado ou com formatação antiga.
+  if(annualPlan&&expiresMs){
+    const expired=Date.now()>=expiresMs;
+    const daysLeft=Math.max(0,Math.ceil((expiresMs-Date.now())/86400000));
+    return {paid:!expired,expired,daysLeft,status,plan,kind:'annual',expiresMs};
+  }
+
+  // Compatibilidade com ativações antigas sem data de vencimento.
+  if(activeStatus){
     if(expiresMs){
       const expired=Date.now()>=expiresMs;
       const daysLeft=Math.max(0,Math.ceil((expiresMs-Date.now())/86400000));
       return {paid:!expired,expired,daysLeft,status,plan,kind:'annual',expiresMs};
     }
-    // Compatibilidade temporária com contas já marcadas como ativas antes do plano anual.
     return {paid:true,expired:false,daysLeft:null,status,plan,kind:'legacy-active',expiresMs:null};
   }
+
   const startMs=firebaseTimeMs(profile?.trialStart);
   if(!startMs)return {paid:false,expired:false,daysLeft:NEXO_TRIAL_DAYS,status:'trial',plan:'trial',kind:'trial'};
   const elapsed=(Date.now()-startMs)/86400000;
@@ -608,8 +630,21 @@ async function loginGoogle(){
   try{authMessage('');const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await auth.signInWithRedirect(provider)}
   catch(err){console.error(err);authMessage(firebaseErrorMessage(err))}
 }
-async function logoutNexo(){try{cloudReady=false;if(cloudUnsubscribe){cloudUnsubscribe();cloudUnsubscribe=null}await auth.signOut()}catch(err){console.error(err);alert('Não foi possível sair agora. Tente novamente.')}}
+async function logoutNexo(){
+  try{
+    cloudReady=false;
+    clearTimeout(cloudSyncTimer);
+    if(cloudUnsubscribe){cloudUnsubscribe();cloudUnsubscribe=null}
+    currentUserProfile=null;
+    clearActiveUserData();
+    await auth.signOut();
+  }catch(err){
+    console.error(err);
+    alert('Não foi possível sair agora. Tente novamente.');
+  }
+}
 function goHotmart(){if(NEXO_HOTMART_URL.startsWith('http'))location.href=NEXO_HOTMART_URL;else alert('O checkout ainda não foi conectado. Cole o link da Hotmart em NEXO_HOTMART_URL.')}
+function contactNexoSupport(){openWhatsApp('44920013836','Olá! Preciso falar com a equipe NEXO. 👋')}
 /* ===== NEXO 1.7 — NUVEM + RELACIONAMENTO ===== */
 let cloudSyncTimer=null, cloudUnsubscribe=null, applyingCloud=false, cloudReady=false;
 function normalizeNexoData(data){
@@ -653,15 +688,26 @@ function rerenderCurrentScreen(){
 async function syncCloudOnLogin(){
   if(!currentFirebaseUser)return;
   const ref=firestore.collection('users').doc(currentFirebaseUser.uid);
-  const snap=await ref.get(),profile=snap.data()||{},cloudData=profile.appData;
+  let snap=null;
+  try{snap=await ref.get({source:'server'})}catch(e){snap=await ref.get()}
+  const profile=snap.data()||{},cloudData=profile.appData;
+
+  // O armazenamento local já é exclusivo deste UID.
+  // Se houver dados na nuvem, eles são a fonte principal e podem ser combinados
+  // apenas com dados locais pertencentes ao MESMO usuário.
   const merged=cloudData?mergeNexoData(cloudData,db):normalizeNexoData(db);
-  applyingCloud=true;db=merged;localStorage.setItem(K,JSON.stringify(db));applyTheme(db.settings.theme);applyingCloud=false;
+  applyingCloud=true;
+  db=merged;
+  persistLocal();
+  applyTheme(db.settings.theme);
+  applyingCloud=false;
+
   cloudReady=true;
   await ref.set({appData:db,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+
   if(cloudUnsubscribe)cloudUnsubscribe();
   cloudUnsubscribe=ref.onSnapshot(doc=>{
     const profile=doc.data()||{};
-    // Atualiza também o estado comercial (trial/active/annual) em tempo real.
     if(currentFirebaseUser)applyAccessProfile(profile);
 
     const remote=profile.appData;
@@ -670,7 +716,7 @@ async function syncCloudOnLogin(){
     if(JSON.stringify(normalized)===JSON.stringify(normalizeNexoData(db)))return;
     applyingCloud=true;
     db=normalized;
-    localStorage.setItem(K,JSON.stringify(db));
+    persistLocal();
     applyTheme(db.settings.theme);
     applyingCloud=false;
     rerenderCurrentScreen();
@@ -717,7 +763,7 @@ function applyBrandTheme(){document.body.classList.remove('theme-beauty','theme-
 async function finishBusinessSetup(){
  db.settings.segment=setupState.segment;db.settings.activities=[...setupState.activities];db.settings.business=setupState.business||db.settings.business;db.settings.openTime=setupState.openTime;db.settings.closeTime=setupState.closeTime;db.settings.brandTheme=setupState.brandTheme;db.settings.onboardingV2Done=true;
  const existing=new Set(db.services.map(s=>String(s.name||'').toLowerCase()));setupState.services.forEach(name=>{if(!existing.has(name.toLowerCase()))db.services.push({id:uid(),name,price:0,duration:30,returnDays:30})});
- localStorage.setItem(K,JSON.stringify(db));
+ persistLocal();
  applyBrandTheme();head();home();setupClose();
  if(currentFirebaseUser){
    try{
@@ -743,13 +789,35 @@ async function bootNexo(){
 
   auth.onAuthStateChanged(async user=>{
     currentFirebaseUser=user||null;currentUserProfile=null;
-    if(user){hideAuth();try{await checkAccess();await syncCloudOnLogin();await checkAccess();applyBrandTheme();if(typeof head==='function')head();if(typeof home==='function')home();if(currentUserProfile?.needsBusinessSetup===true)setupOpen()}catch(err){console.error(err);authMessage('Erro ao carregar sua conta.');showAuth()}}
-    else{$('trialLock').classList.remove('show');$('trialBanner').classList.remove('show');toggleAuth('login');showAuth()}
+    if(user){
+      // Carrega somente o cache local pertencente ao UID autenticado.
+      loadLocalForUser(user.uid);
+      hideAuth();
+      try{
+        await checkAccess();
+        await syncCloudOnLogin();
+        await checkAccess();
+        applyBrandTheme();
+        if(typeof head==='function')head();
+        if(typeof home==='function')home();
+        if(currentUserProfile?.needsBusinessSetup===true)setupOpen();
+      }catch(err){
+        console.error(err);
+        authMessage('Erro ao carregar sua conta.');
+        showAuth();
+      }
+    }else{
+      clearActiveUserData();
+      $('trialLock').classList.remove('show');
+      $('trialBanner').classList.remove('show');
+      toggleAuth('login');
+      showAuth();
+    }
   });
 }
 window.addEventListener('load',bootNexo);
 
-const K='NEXO13',NEXO_APP_VERSION='1.8.6',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='1.8.8',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function applyTheme(theme){
   const chosen=theme==='nexo'?'nexo':'light';
   document.body.classList.toggle('theme-nexo',chosen==='nexo');
@@ -762,8 +830,42 @@ function setThemeChoice(theme){
   document.querySelectorAll('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.theme===chosen));
   applyTheme(chosen);
 }
-let db=JSON.parse(localStorage.getItem(K)||'null')||JSON.parse(localStorage.getItem('NEXO12')||'null')||JSON.parse(localStorage.getItem('NEXO11')||'null')||{settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]};
-db=normalizeNexoData(db);db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';applyTheme(db.settings.theme);db.settings.workdays=db.settings.workdays||22;db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));db.settings.openTime=db.settings.openTime||'09:00';db.settings.closeTime=db.settings.closeTime||'19:00';db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);localStorage.setItem(K,JSON.stringify(db));const save=()=>{localStorage.setItem(K,JSON.stringify(db));scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
+const emptyNexoData=()=>({settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]});
+let currentLocalKey=null;
+let db=normalizeNexoData(emptyNexoData());
+
+function userLocalKey(uidValue){
+  return uidValue?`${K_BASE}_${uidValue}`:null;
+}
+function persistLocal(){
+  if(!currentLocalKey)return;
+  localStorage.setItem(currentLocalKey,JSON.stringify(db));
+}
+function prepareDbAfterLoad(){
+  db=normalizeNexoData(db);
+  db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';
+  applyTheme(db.settings.theme);
+  db.settings.workdays=db.settings.workdays||22;
+  db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);
+  db.settings.monthlyGoal=db.settings.monthlyGoal||((+db.settings.goal||400)*(+db.settings.workdays||22));
+  db.settings.openTime=db.settings.openTime||'09:00';
+  db.settings.closeTime=db.settings.closeTime||'19:00';
+  db.settings.slotInterval=Math.max(15,+db.settings.slotInterval||30);
+}
+function loadLocalForUser(uidValue){
+  currentLocalKey=userLocalKey(uidValue);
+  let local=null;
+  try{local=currentLocalKey?JSON.parse(localStorage.getItem(currentLocalKey)||'null'):null}catch(e){console.warn('NEXO local inválido:',e)}
+  db=normalizeNexoData(local||emptyNexoData());
+  prepareDbAfterLoad();
+}
+function clearActiveUserData(){
+  currentLocalKey=null;
+  db=normalizeNexoData(emptyNexoData());
+  prepareDbAfterLoad();
+}
+prepareDbAfterLoad();
+const save=()=>{persistLocal();scheduleCloudSave()},dbr=d=>d?new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'—';
 function f(l,id,t='text',v='',x=''){return `<div class="field"><label>${l}</label><input id="${id}" type="${t}" value="${E(v)}" ${x}></div>`}function open(h){$('body').innerHTML=h;$('modal').classList.add('show')}function closeModal(){$('modal').classList.remove('show')}
 function show(id,b){closeFab();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}if(id==='home')home();if(id==='agenda')agenda();if(id==='clients')renderClients();if(id==='services')renderServices();if(id==='finance')finance();if(id==='life')life($('lifeMonth')?.value||currentMonth());if(id==='goals')goals();if(id==='stock')stock();if(id==='reports')reports()}
 function head(){$('date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});$('biz').textContent=db.settings.business;if($('headerBiz'))$('headerBiz').textContent=db.settings.business;if($('agendaPicker')&&!$('agendaPicker').value)$('agendaPicker').value=T();$('agendaDate').textContent='Hoje • '+dbr(T())}
@@ -1582,7 +1684,7 @@ function fabAction(action){
 $('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};head();home();
 </script>
 <script>
-/* NEXO 1.8.6 • PWA */
+/* NEXO 1.8.8 • PWA */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
