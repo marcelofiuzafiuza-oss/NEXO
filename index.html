@@ -462,7 +462,7 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.9.0</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 1.9.1</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -711,13 +711,18 @@ function mergeNexoData(cloudData,localData){
   return out;
 }
 async function pushCloudNow(){
-  if(!currentFirebaseUser||applyingCloud)return;
+  if(!currentFirebaseUser||applyingCloud)return false;
   try{
+    if(isDeveloperAccount())persistDeveloperProspects();
     const payload=normalizeNexoData(db);
     const cloudPayload={appData:payload,appDataUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()};
     if(isDeveloperAccount())cloudPayload.developerProspects=Array.isArray(db.prospects)?db.prospects:[];
     await firestore.collection('users').doc(currentFirebaseUser.uid).set(cloudPayload,{merge:true});
-  }catch(err){console.error('NEXO cloud save:',err)}
+    return true;
+  }catch(err){
+    console.error('NEXO cloud save:',err);
+    return false;
+  }
 }
 function scheduleCloudSave(){
   if(!currentFirebaseUser||!cloudReady||applyingCloud)return;
@@ -732,16 +737,28 @@ async function syncCloudOnLogin(){
   let snap=null;
   try{snap=await ref.get({source:'server'})}catch(e){snap=await ref.get()}
   const profile=snap.data()||{},cloudData=profile.appData;
-  if((profile.developer===true||profile.isDeveloper===true||['developer','admin'].includes(String(profile.role||'').toLowerCase()))&&Array.isArray(profile.developerProspects)){
-    db.prospects=profile.developerProspects;
+  const developerAllowed=(profile.developer===true||profile.isDeveloper===true||['developer','admin'].includes(String(profile.role||'').toLowerCase()));
+  const localProspectBackup=developerAllowed?loadDeveloperProspectsLocal(currentFirebaseUser.uid):[];
+  if(developerAllowed){
+    db.prospects=mergeProspectsPreferNewest(
+      Array.isArray(profile.developerProspects)?profile.developerProspects:[],
+      Array.isArray(cloudData?.prospects)?cloudData.prospects:[],
+      localProspectBackup,
+      Array.isArray(db.prospects)?db.prospects:[]
+    );
   }
 
   // O armazenamento local já é exclusivo deste UID.
   // Se houver dados na nuvem, eles são a fonte principal e podem ser combinados
   // apenas com dados locais pertencentes ao MESMO usuário.
   const merged=cloudData?mergeNexoData(cloudData,db):normalizeNexoData(db);
-  if((profile.developer===true||profile.isDeveloper===true||['developer','admin'].includes(String(profile.role||'').toLowerCase()))&&Array.isArray(profile.developerProspects)){
-    merged.prospects=profile.developerProspects;
+  if(developerAllowed){
+    merged.prospects=mergeProspectsPreferNewest(
+      Array.isArray(profile.developerProspects)?profile.developerProspects:[],
+      Array.isArray(cloudData?.prospects)?cloudData.prospects:[],
+      localProspectBackup,
+      Array.isArray(merged.prospects)?merged.prospects:[]
+    );
   }
   applyingCloud=true;
   db=merged;
@@ -762,10 +779,13 @@ async function syncCloudOnLogin(){
     const remote=profile.appData;
     if(!remote||applyingCloud)return;
     const normalized=normalizeNexoData(remote);
-    if(isDeveloperAccount()&&Array.isArray(profile.developerProspects)){
-      normalized.prospects=profile.developerProspects;
-    }else if(isDeveloperAccount()&&Array.isArray(db.prospects)&&db.prospects.length){
-      normalized.prospects=db.prospects;
+    if(isDeveloperAccount()){
+      normalized.prospects=mergeProspectsPreferNewest(
+        Array.isArray(profile.developerProspects)?profile.developerProspects:[],
+        Array.isArray(normalized.prospects)?normalized.prospects:[],
+        loadDeveloperProspectsLocal(currentFirebaseUser?.uid),
+        Array.isArray(db.prospects)?db.prospects:[]
+      );
     }
     if(JSON.stringify(normalized)===JSON.stringify(normalizeNexoData(db)))return;
     applyingCloud=true;
@@ -891,9 +911,45 @@ let db=normalizeNexoData(emptyNexoData());
 function userLocalKey(uidValue){
   return uidValue?`${K_BASE}_${uidValue}`:null;
 }
+
+function developerProspectLocalKey(uidValue){
+  return uidValue?`${K_BASE}_DEV_PROSPECTS_${uidValue}`:null;
+}
+function persistDeveloperProspects(){
+  if(!currentFirebaseUser||!isDeveloperAccount())return;
+  const key=developerProspectLocalKey(currentFirebaseUser.uid);
+  if(!key)return;
+  localStorage.setItem(key,JSON.stringify(Array.isArray(db.prospects)?db.prospects:[]));
+}
+function loadDeveloperProspectsLocal(uidValue){
+  const key=developerProspectLocalKey(uidValue);
+  if(!key)return [];
+  try{
+    const v=JSON.parse(localStorage.getItem(key)||'[]');
+    return Array.isArray(v)?v:[];
+  }catch(e){
+    console.warn('Backup local da prospecção inválido:',e);
+    return [];
+  }
+}
+function mergeProspectsPreferNewest(...lists){
+  const out=[], seenPhones=new Set(), seenNames=new Set();
+  lists.flat().forEach(x=>{
+    if(!x||typeof x!=='object')return;
+    const phone=normalizeLeadPhone(x.phone||'');
+    const name=String(x.name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+    const dup=(phone&&seenPhones.has(phone))||(!phone&&name&&seenNames.has(name));
+    if(dup)return;
+    if(phone)seenPhones.add(phone);
+    if(name)seenNames.add(name);
+    out.push(x);
+  });
+  return out;
+}
 function persistLocal(){
   if(!currentLocalKey)return;
   localStorage.setItem(currentLocalKey,JSON.stringify(db));
+  if(currentFirebaseUser&&isDeveloperAccount())persistDeveloperProspects();
 }
 function prepareDbAfterLoad(){
   db=normalizeNexoData(db);
@@ -1777,7 +1833,7 @@ function developerNewLead(){
       <button class="btn primary" onclick="developerSaveNewLead()">Salvar lead</button>
     </div>`);
 }
-function developerSaveNewLead(){
+async function developerSaveNewLead(){
   if(!isDeveloperAccount())return;
   const name=($('dln')?.value||'').trim();
   const phone=($('dlp')?.value||'').trim();
@@ -1807,17 +1863,18 @@ function developerSaveNewLead(){
     createdAt:new Date().toISOString()
   });
   save();
-  pushCloudNow();
+  persistDeveloperProspects();
+  const cloudOk=await pushCloudNow();
   closeModal();
   if($('devSearch'))$('devSearch').value=name;
   renderDeveloper();
-  alert('Lead adicionado e salvo na nuvem.');
+  alert(cloudOk?'Lead adicionado e salvo na nuvem.':'Lead salvo neste aparelho. Não foi possível confirmar o envio ao Firebase agora; ele tentará sincronizar novamente.');
 }
 
 function developerImportCSV(file){
   if(!isDeveloperAccount()||!file)return;
   const r=new FileReader();
-  r.onload=()=>{
+  r.onload=async()=>{
     try{
       const text=String(r.result||'').replace(/^\uFEFF/,'');
       const lines=text.split(/\r?\n/).filter(x=>x.trim());
@@ -1831,7 +1888,13 @@ function developerImportCSV(file){
       const existing=new Set((db.prospects||[]).map(x=>normalizeLeadPhone(x.phone)).filter(Boolean));
       let added=0,dup=0;
       lines.slice(1).forEach(line=>{const c=parse(line),name=(c[iname]||'').trim(),phone=(c[iphone]||'').trim(),key=normalizeLeadPhone(phone);if(!name)return;if(key&&existing.has(key)){dup++;return}db.prospects.push({id:uid(),name,phone,category:icat>=0?(c[icat]||'').trim():'',city:icity>=0?(c[icity]||'').trim():'',note:inote>=0?(c[inote]||'').trim():'',status:'new',createdAt:new Date().toISOString()});if(key)existing.add(key);added++});
-      save();pushCloudNow();renderDeveloper();alert(`${added} lead(s) importado(s) e salvos na nuvem.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
+      save();
+      persistDeveloperProspects();
+      const cloudOk=await pushCloudNow();
+      renderDeveloper();
+      alert(cloudOk
+        ? `${added} lead(s) importado(s) e salvos no Firebase.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`
+        : `${added} lead(s) importado(s) e salvos neste aparelho, mas o Firebase não confirmou a gravação agora.${dup?` ${dup} duplicado(s) ignorado(s).`:''}`);
     }catch(e){console.error(e);alert('Não foi possível importar este CSV.');}
     $('devImportFile').value='';
   };
