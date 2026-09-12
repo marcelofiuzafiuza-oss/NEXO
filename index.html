@@ -179,6 +179,131 @@ body.theme-darkbrand header #headerBiz{color:#cbd5e1!important}
 .dev-status{font-size:10px;font-weight:800;padding:5px 8px;border-radius:999px;background:#f3f4f6;color:#374151}
 body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
 
+
+/* ===== NEXO 2.0 PREVIEW • PREMIUM UI ===== */
+:root{
+  --nx-accent:#8f174f;
+  --nx-accent-2:#bd2b68;
+  --nx-green:#10b981;
+  --nx-bg:#f5f3f4;
+  --nx-surface:#ffffff;
+  --nx-surface-2:#faf7f8;
+  --nx-text:#181216;
+  --nx-muted:#786b72;
+  --nx-border:#eadfe4;
+  --nx-shadow:0 12px 34px rgba(62,25,43,.08);
+}
+body.theme-premium-light{
+  background:
+    radial-gradient(circle at 15% -10%,rgba(143,23,79,.08),transparent 31%),
+    linear-gradient(180deg,#faf8f9 0,#f4f1f3 100%);
+  color:var(--nx-text);
+}
+body.theme-premium-dark{
+  --nx-bg:#0e0c0d;
+  --nx-surface:#171416;
+  --nx-surface-2:#211a1e;
+  --nx-text:#fffafc;
+  --nx-muted:#b9aeb4;
+  --nx-border:#31272c;
+  --nx-shadow:0 18px 44px rgba(0,0,0,.28);
+  background:
+    radial-gradient(circle at 18% -8%,rgba(143,23,79,.24),transparent 33%),
+    radial-gradient(circle at 92% 18%,rgba(16,185,129,.08),transparent 26%),
+    #0e0c0d;
+  color:var(--nx-text);
+}
+body.theme-premium-light .app,body.theme-premium-dark .app{max-width:560px}
+body.theme-premium-light header,body.theme-premium-dark header{padding:18px 18px 8px}
+body.theme-premium-light #headerBiz,body.theme-premium-dark #headerBiz,
+body.theme-premium-light .date,body.theme-premium-dark .date{color:var(--nx-muted)!important}
+body.theme-premium-dark .nexo-wordmark{color:#fff}
+body.theme-premium-light .nexo-wordmark{color:#2a2025}
+body.theme-premium-light .nexo-scissor,body.theme-premium-dark .nexo-scissor,
+body.theme-premium-light .nexo-o,body.theme-premium-dark .nexo-o{color:var(--nx-green)!important}
+body.theme-premium-light .screen,body.theme-premium-dark .screen{padding:8px 18px}
+body.theme-premium-light .card,body.theme-premium-light .metric,
+body.theme-premium-dark .card,body.theme-premium-dark .metric{
+  background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);
+  box-shadow:var(--nx-shadow);
+}
+body.theme-premium-light .sub,body.theme-premium-light .muted,body.theme-premium-light .small,
+body.theme-premium-dark .sub,body.theme-premium-dark .muted,body.theme-premium-dark .small{color:var(--nx-muted)}
+body.theme-premium-light .item,body.theme-premium-dark .item{border-color:var(--nx-border)}
+body.theme-premium-light hr,body.theme-premium-dark hr{border-color:var(--nx-border)}
+body.theme-premium-light .sheet,body.theme-premium-dark .sheet{background:var(--nx-bg);color:var(--nx-text)}
+body.theme-premium-light .search,body.theme-premium-light .field input,body.theme-premium-light .field select,body.theme-premium-light .field textarea,
+body.theme-premium-dark .search,body.theme-premium-dark .field input,body.theme-premium-dark .field select,body.theme-premium-dark .field textarea{
+  background:var(--nx-surface);border-color:var(--nx-border);color:var(--nx-text)
+}
+body.theme-premium-light .field label,body.theme-premium-dark .field label{color:var(--nx-muted)}
+body.theme-premium-light .ghost,body.theme-premium-dark .ghost{background:var(--nx-surface-2);color:var(--nx-text);border:1px solid var(--nx-border)}
+body.theme-premium-light .dark,body.theme-premium-dark .dark{background:#21171c;color:#fff}
+body.theme-premium-dark .dark{background:#fff;color:#171416}
+body.theme-premium-light .primary,body.theme-premium-dark .primary{background:linear-gradient(135deg,var(--nx-accent),var(--nx-accent-2));color:#fff}
+body.theme-premium-light .progress,body.theme-premium-dark .progress{background:var(--nx-border)}
+body.theme-premium-light .progress div,body.theme-premium-dark .progress div{background:linear-gradient(90deg,var(--nx-accent),var(--nx-green))}
+body.theme-premium-light .nav,body.theme-premium-dark .nav{
+  height:74px;background:color-mix(in srgb,var(--nx-surface) 94%,transparent);
+  border-color:var(--nx-border);backdrop-filter:blur(18px);box-shadow:0 -10px 30px rgba(0,0,0,.06)
+}
+body.theme-premium-light .nav button,body.theme-premium-dark .nav button{color:var(--nx-muted)}
+body.theme-premium-light .nav button.active,body.theme-premium-dark .nav button.active{color:var(--nx-accent)}
+body.theme-premium-light .fab,body.theme-premium-dark .fab{
+  background:linear-gradient(135deg,var(--nx-green),#087b57);
+  box-shadow:0 14px 28px rgba(16,185,129,.28);border:4px solid var(--nx-bg)
+}
+body.theme-premium-light .trial-banner,body.theme-premium-dark .trial-banner{
+  margin:8px 18px 4px;border-radius:17px;background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);box-shadow:var(--nx-shadow)
+}
+body.theme-premium-light .notice,body.theme-premium-dark .notice{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.24);color:var(--nx-text)}
+.nx-head-actions{display:flex;align-items:center;gap:9px}
+.nx-theme-toggle{width:42px;height:42px;border-radius:14px;border:1px solid var(--nx-border);background:var(--nx-surface);color:var(--nx-text);font-size:18px;box-shadow:var(--nx-shadow);cursor:pointer}
+.nx-home-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:10px 2px 14px}
+.nx-home-intro h1{font-size:26px;line-height:1.05;margin:0;font-weight:900;letter-spacing:-.8px}
+.nx-home-intro p{margin:6px 0 0;color:var(--nx-muted);font-size:12px}
+.nx-premium-hero{
+  position:relative;overflow:hidden;border-radius:28px;padding:22px;
+  background:
+    radial-gradient(circle at 82% 12%,rgba(16,185,129,.18),transparent 29%),
+    radial-gradient(circle at 6% 100%,rgba(189,43,104,.34),transparent 38%),
+    linear-gradient(135deg,#241017 0%,#140f11 58%,#0d1110 100%);
+  color:#fff;box-shadow:0 20px 46px rgba(64,13,39,.24);border:1px solid rgba(255,255,255,.08)
+}
+.nx-premium-hero .nx-kicker{font-size:13px;color:#d7c9d0;font-weight:700}
+.nx-premium-hero .nx-money{font-size:42px;line-height:1;font-weight:950;letter-spacing:-1.8px;margin:8px 0 18px}
+.nx-hero-grid{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.nx-hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid #ffffff1f;padding-top:15px}
+.nx-hero-stat b{display:block;font-size:17px}.nx-hero-stat span{font-size:10px;color:#d7c9d0}
+.nx-ring{--pct:0;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--nx-green) calc(var(--pct)*1%),#ffffff20 0);display:grid;place-items:center;box-shadow:0 0 26px rgba(16,185,129,.18)}
+.nx-ring:before{content:"";width:73px;height:73px;border-radius:50%;background:#131011;position:absolute}
+.nx-ring-value{position:relative;z-index:1;text-align:center;font-weight:900;font-size:22px}.nx-ring-value small{display:block;font-size:9px;color:#cbbfc5;font-weight:700;margin-top:2px}
+.nx-shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.nx-shortcut{border:1px solid var(--nx-border);background:var(--nx-surface);border-radius:20px;padding:13px 9px;text-align:left;color:var(--nx-text);box-shadow:var(--nx-shadow);min-height:92px;cursor:pointer}
+.nx-shortcut .ico{font-size:22px;display:block;margin-bottom:8px}.nx-shortcut b{font-size:12px;display:block}.nx-shortcut small{font-size:9px;color:var(--nx-muted)}
+.nx-next{
+  display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;margin-top:14px;
+  background:linear-gradient(135deg,#fff7f3,#f7e7ec);border:1px solid #f0d8df;border-radius:23px;padding:16px;color:#21171c;box-shadow:var(--nx-shadow)
+}
+body.theme-premium-dark .nx-next{background:linear-gradient(135deg,#24191d,#1b1618);border-color:#39282f;color:#fff}
+.nx-next-time{font-size:28px;font-weight:950;letter-spacing:-1px}.nx-next .ico{width:44px;height:44px;border-radius:15px;background:#8f174f18;display:grid;place-items:center;font-size:21px}
+.nx-next button{border:0;border-radius:14px;padding:10px 12px;background:linear-gradient(135deg,var(--nx-accent),var(--nx-accent-2));color:#fff;font-weight:800}
+.nx-section-title{font-size:17px;font-weight:900;margin:20px 2px 9px;display:flex;justify-content:space-between;align-items:center}
+.nx-section-title span{font-size:10px;color:var(--nx-muted);font-weight:700}
+.nx-life-card{border-radius:22px!important}
+.nx-quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.nx-action{border:1px solid var(--nx-border);background:var(--nx-surface);color:var(--nx-text);border-radius:18px;padding:13px;text-align:left;font-weight:800;box-shadow:var(--nx-shadow)}
+.nx-action span{font-size:21px;display:block;margin-bottom:5px}
+.theme-option.premium-light .theme-dot{background:#fff;border-color:#d7c8cf}
+.theme-option.premium-dark .theme-dot{background:#151214;border-color:#392e33}
+body.theme-premium-light .theme-option,body.theme-premium-dark .theme-option{background:var(--nx-surface);border-color:var(--nx-border);color:var(--nx-text)}
+body.theme-premium-light .theme-option small,body.theme-premium-dark .theme-option small{color:var(--nx-muted)}
+body.theme-premium-light .theme-option.selected,body.theme-premium-dark .theme-option.selected{border-color:var(--nx-accent);box-shadow:0 0 0 2px rgba(143,23,79,.12)}
+@media(max-width:390px){
+  .nx-premium-hero{padding:18px}.nx-premium-hero .nx-money{font-size:36px}.nx-ring{width:86px;height:86px}.nx-ring:before{width:64px;height:64px}
+  .nx-shortcuts{grid-template-columns:repeat(2,1fr)}.nx-next{grid-template-columns:auto 1fr}.nx-next button{grid-column:1/-1}
+}
+
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -237,10 +362,66 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
     <div class="setup-actions" id="setupActions"></div>
   </div>
 </div>
-<div class="app"><header style="align-items:flex-start"><div><div class="logo nexo-wordmark" style="font-size:34px;line-height:1"><span>NE</span><svg class="nexo-scissor" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="16" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><circle cx="48" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><path d="M21.5 42.5 49.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><path d="M42.5 42.5 14.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><circle cx="32" cy="30" r="3.4" fill="#fff" stroke="currentColor" stroke-width="3"/></svg><span class="nexo-o">O</span></div><div id="headerBiz" class="sub" style="margin-top:5px;font-weight:700;color:#374151"></div></div><div class="date" id="date"></div></header>
+<div class="app"><header style="align-items:flex-start"><div><div class="logo nexo-wordmark" style="font-size:34px;line-height:1"><span>NE</span><svg class="nexo-scissor" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="16" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><circle cx="48" cy="48" r="8" fill="none" stroke="currentColor" stroke-width="4.5"/><path d="M21.5 42.5 49.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><path d="M42.5 42.5 14.5 8.5" fill="none" stroke="currentColor" stroke-width="4.8" stroke-linecap="round"/><circle cx="32" cy="30" r="3.4" fill="#fff" stroke="currentColor" stroke-width="3"/></svg><span class="nexo-o">O</span></div><div id="headerBiz" class="sub" style="margin-top:5px;font-weight:700;color:#374151"></div></div><div class="nx-head-actions"><div class="date" id="date"></div><button class="nx-theme-toggle" id="quickThemeToggle" onclick="togglePremiumTheme()" title="Alternar tema">☾</button></div></header>
 <div class="trial-banner" id="trialBanner"></div>
 
-<section id="home" class="screen active"><div class="hero"><div class="small" id="biz"></div><div class="big" id="rev">R$ 0,00</div><div class="small">faturamento de hoje</div></div><div class="grid"><div class="metric"><div class="small">Receitas</div><div class="value" id="mIn">R$ 0,00</div></div><div class="metric"><div class="small">Despesas</div><div class="value" id="mOut">R$ 0,00</div></div><div class="metric"><div class="small">Resultado</div><div class="value" id="mResult">R$ 0,00</div></div><div class="metric"><div class="small">Atendimentos</div><div class="value" id="mDone">0</div></div></div><div class="card"><div class="row"><b>Meta diária</b><span id="goalPct" class="muted">0%</span></div><div class="progress"><div id="goalBar"></div></div><div class="sub" id="goalText" style="margin-top:7px"></div></div><div class="section"><h2>O NEXO recomenda hoje</h2><span class="muted" id="recommendCount"></span></div><div class="card" id="recommendList"><div class="empty">Analisando sua rotina...</div></div><div class="section"><h2>Minha Vida</h2><span class="muted">mês atual</span></div><div class="card"><div class="row"><div><div class="small">Contas pessoais</div><div class="value" id="lifeTotal">R$ 0,00</div></div><div style="text-align:right"><div class="small">Falta</div><div class="value" id="lifeLeft">R$ 0,00</div></div></div><div class="progress"><div id="lifeBar"></div></div><div class="sub" id="lifeNeed" style="margin-top:7px"></div></div><div class="section"><h2>Próximos atendimentos</h2></div><div class="card" id="nextList"></div></section>
+<section id="home" class="screen active">
+  <div class="nx-home-intro">
+    <div><h1 id="nxGreeting">Olá!</h1><p>Seu negócio em um só lugar.</p></div>
+    <div class="muted" style="text-align:right;font-size:10px">Visão de hoje<br><b id="biz"></b></div>
+  </div>
+
+  <div class="nx-premium-hero">
+    <div class="nx-hero-grid">
+      <div>
+        <div class="nx-kicker">Faturamento hoje</div>
+        <div class="nx-money" id="rev">R$ 0,00</div>
+        <div class="nx-hero-stats">
+          <div class="nx-hero-stat"><b id="mDone">0</b><span>Atendimentos</span></div>
+          <div class="nx-hero-stat"><b id="nxTicket">R$ 0,00</b><span>Ticket médio</span></div>
+          <div class="nx-hero-stat"><b id="nxGoalLeft">R$ 0,00</b><span>Falta p/ meta</span></div>
+        </div>
+      </div>
+      <div class="nx-ring" id="nxGoalRing"><div class="nx-ring-value"><span id="goalPct">0%</span><small>da meta</small></div></div>
+    </div>
+    <div class="progress" style="margin-top:16px"><div id="goalBar"></div></div>
+    <div class="small" id="goalText" style="margin-top:7px;color:#d7c9d0"></div>
+  </div>
+
+  <div class="nx-shortcuts">
+    <button class="nx-shortcut" onclick="show('agenda')"><span class="ico">▣</span><b>Agenda</b><small id="nxAgendaCount">0 hoje</small></button>
+    <button class="nx-shortcut" onclick="show('finance')"><span class="ico">▥</span><b>Financeiro</b><small id="mResult">R$ 0,00</small></button>
+    <button class="nx-shortcut" onclick="show('clients')"><span class="ico">♙</span><b>Clientes</b><small id="nxClientCount">0 cadastrados</small></button>
+    <button class="nx-shortcut" onclick="show('stock')"><span class="ico">◇</span><b>Estoque</b><small id="nxStockCount">0 itens</small></button>
+  </div>
+
+  <div class="nx-next" id="nxNextCard">
+    <div class="ico">◷</div>
+    <div><div class="small" style="color:inherit;opacity:.65">Próximo atendimento</div><div class="nx-next-time" id="nxNextTime">--:--</div><div class="sub" id="nxNextInfo">Nenhum agendamento pendente</div></div>
+    <button onclick="show('agenda')">Ver agenda ›</button>
+  </div>
+
+  <div class="nx-section-title">O NEXO recomenda hoje <span id="recommendCount"></span></div>
+  <div class="card" id="recommendList"><div class="empty">Analisando sua rotina...</div></div>
+
+  <div class="nx-section-title">Ações rápidas <span>atalhos</span></div>
+  <div class="nx-quick-actions">
+    <button class="nx-action" onclick="newAppt()"><span>▣</span>Novo agendamento</button>
+    <button class="nx-action" onclick="show('finance');newTxType('in')"><span>⊕</span>Nova receita</button>
+    <button class="nx-action" onclick="newClient()"><span>♙</span>Novo cliente</button>
+    <button class="nx-action" onclick="show('clients')"><span>◉</span>WhatsApp / clientes</button>
+  </div>
+
+  <div style="display:none">
+    <span id="mIn">R$ 0,00</span><span id="mOut">R$ 0,00</span>
+  </div>
+
+  <div class="nx-section-title">Minha Vida <span>mês atual</span></div>
+  <div class="card nx-life-card"><div class="row"><div><div class="small">Contas pessoais</div><div class="value" id="lifeTotal">R$ 0,00</div></div><div style="text-align:right"><div class="small">Falta</div><div class="value" id="lifeLeft">R$ 0,00</div></div></div><div class="progress"><div id="lifeBar"></div></div><div class="sub" id="lifeNeed" style="margin-top:7px"></div></div>
+
+  <div class="nx-section-title">Próximos atendimentos</div>
+  <div class="card" id="nextList"></div>
+</section>
 <section id="agenda" class="screen"><div class="section"><h2>Agenda</h2><div style="display:flex;gap:7px"><button class="btn ghost" onclick="newManualAppt()">+ Manual</button><button class="btn primary" onclick="newAppt()">+ Agendar</button></div></div><div class="card"><div class="field" style="margin:0"><label>Ver agendamentos de</label><input id="agendaPicker" type="date" onchange="agenda(this.value)"></div><div class="row" style="margin-top:10px"><b id="agendaDate"></b><span class="muted" id="agendaSummary"></span></div></div><div class="card" id="agendaList"></div></section>
 <section id="clients" class="screen"><div class="section"><h2>Clientes</h2><button class="btn primary" onclick="newClient()">+ Cliente</button></div><input class="search" id="search" placeholder="Buscar cliente..." oninput="renderClients()"><div class="card" id="clientList"></div></section>
 <section id="services" class="screen"><div class="section"><h2>Serviços</h2><button class="btn primary" onclick="newService()">+ Serviço</button></div><div class="card" id="serviceList"></div></section>
@@ -468,7 +649,7 @@ body.theme-nexo .dev-stat{background:#dcebe3;border-color:#c4dbcf}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 1.9.2</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -898,18 +1079,27 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='1.8.9',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.0-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function normalizePremiumTheme(theme){
+  return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
+}
 function applyTheme(theme){
-  const chosen=theme==='nexo'?'nexo':'light';
-  document.body.classList.toggle('theme-nexo',chosen==='nexo');
-  const meta=document.querySelector('meta[name=\"theme-color\"]');
-  if(meta)meta.setAttribute('content',chosen==='nexo'?'#eaf3ee':'#111827');
+  const chosen=normalizePremiumTheme(theme);
+  document.body.classList.remove('theme-nexo','theme-premium-light','theme-premium-dark');
+  document.body.classList.add(chosen);
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.setAttribute('content',chosen==='premium-dark'?'#0e0c0d':'#f5f3f4');
+  const q=$('quickThemeToggle');if(q)q.textContent=chosen==='premium-dark'?'☀':'☾';
 }
 function setThemeChoice(theme){
-  const chosen=theme==='nexo'?'nexo':'light';
+  const chosen=normalizePremiumTheme(theme);
   const input=$('stheme');if(input)input.value=chosen;
   document.querySelectorAll('.theme-option').forEach(b=>b.classList.toggle('selected',b.dataset.theme===chosen));
   applyTheme(chosen);
+}
+function togglePremiumTheme(){
+  const next=normalizePremiumTheme(db.settings.theme)==='premium-dark'?'premium-light':'premium-dark';
+  db.settings.theme=next;applyTheme(next);save();
 }
 const emptyNexoData=()=>({settings:{business:'Minha Barbearia',goal:400,weeklyGoal:2000,monthlyGoal:8000,workdays:22,openTime:'09:00',closeTime:'19:00',slotInterval:30,theme:'light',segment:'barber',activities:['barber'],brandTheme:'barber'},clients:[],services:[],appointments:[],tx:[],bills:[],stock:[],stockMoves:[]});
 let currentLocalKey=null;
@@ -960,7 +1150,7 @@ function persistLocal(){
 }
 function prepareDbAfterLoad(){
   db=normalizeNexoData(db);
-  db.settings.theme=db.settings.theme==='nexo'?'nexo':'light';
+  db.settings.theme=normalizePremiumTheme(db.settings.theme);
   applyTheme(db.settings.theme);
   db.settings.workdays=db.settings.workdays||22;
   db.settings.weeklyGoal=db.settings.weeklyGoal||((+db.settings.goal||400)*5);
@@ -1033,7 +1223,7 @@ function renderRecommendations(){
   const items=recommendationItems();if(count)count.textContent=items.length?`${items.length} sugest${items.length===1?'ão':'ões'}`:'tudo certo';
   box.innerHTML=items.length?items.map(i=>`<div class="item"><div class="row"><div style="display:flex;gap:10px;align-items:flex-start;min-width:0"><div style="font-size:22px;line-height:1">${i.icon}</div><div><div class="name">${E(i.title)}</div><div class="sub">${E(i.sub)}</div></div></div><button class="btn ghost" style="flex:none" onclick="${i.action}">${E(i.label)}</button></div></div>`).join(''):'<div class="notice">Tudo em ordem por aqui. O NEXO não encontrou nenhuma ação importante para hoje. ✓</div>';
 }
-function home(){head();let a=db.appointments.filter(x=>x.date===T()),done=a.filter(x=>x.status==='completed'),r=done.reduce((s,x)=>s+ +x.value,0),ins=db.tx.filter(x=>x.date===T()&&x.type==='in').reduce((s,x)=>s+ +x.amount,0),outs=db.tx.filter(x=>x.date===T()&&x.type==='out').reduce((s,x)=>s+ +x.amount,0),g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));renderRecommendations();let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div></div><div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','reminder')">💬 Lembrar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
+function home(){head();let a=db.appointments.filter(x=>x.date===T()),done=a.filter(x=>x.status==='completed'),r=done.reduce((s,x)=>s+ +x.value,0),ins=db.tx.filter(x=>x.date===T()&&x.type==='in').reduce((s,x)=>s+ +x.amount,0),outs=db.tx.filter(x=>x.date===T()&&x.type==='out').reduce((s,x)=>s+ +x.amount,0),g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));if($('nxGoalRing'))$('nxGoalRing').style.setProperty('--pct',Math.round(p));if($('nxTicket'))$('nxTicket').textContent=M(done.length?r/done.length:0);if($('nxGoalLeft'))$('nxGoalLeft').textContent=M(Math.max(0,g-r));if($('nxAgendaCount'))$('nxAgendaCount').textContent=a.length+' hoje';if($('nxClientCount'))$('nxClientCount').textContent=db.clients.length+' cadastrados';if($('nxStockCount'))$('nxStockCount').textContent=db.stock.length+' itens';if($('nxGreeting')){const nm=(currentFirebaseUser?.displayName||'').trim().split(/\s+/)[0];$('nxGreeting').textContent=nm?'Olá, '+nm+'!':'Olá!'}renderRecommendations();let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));if($('nxNextTime'))$('nxNextTime').textContent=op[0]?.time||'--:--';if($('nxNextInfo'))$('nxNextInfo').textContent=op[0]?`${op[0].client} • ${op[0].service}`:'Nenhum agendamento pendente';$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div></div><div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','reminder')">💬 Lembrar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
 
 function newClient(){open(`<h3>Novo cliente</h3>${f('Nome','cn')}${f('Telefone','cp','tel')}${f('Data de aniversário','cb','date')}<div class="field"><label>Observação</label><textarea id="co" rows="3"></textarea></div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addClient()">Salvar</button></div>`)}
 function addClient(){let n=$('cn').value.trim();if(!n)return alert('Informe o nome.');db.clients.push({id:uid(),name:n,phone:$('cp').value.trim(),birthday:$('cb').value||'',note:$('co').value.trim(),visits:0,total:0,last:''});save();closeModal();renderClients();home()}
@@ -1988,7 +2178,7 @@ function developerChangeStatus(id){
 }
 function developerDeleteLead(id){if(!isDeveloperAccount())return;const x=(db.prospects||[]).find(v=>v.id===id);if(x&&confirm('Excluir '+x.name+' da prospecção?')){db.prospects=db.prospects.filter(v=>v.id!==id);save();renderDeveloper()}}
 
-function settings(){const theme=db.settings.theme==='nexo'?'nexo':'light';open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="light" class="theme-option light ${theme==='light'?'selected':''}" onclick="setThemeChoice('light')"><span class="theme-dot"></span>Claro<small>Visual original do NEXO</small></button><button type="button" data-theme="nexo" class="theme-option nexo ${theme==='nexo'?'selected':''}" onclick="setThemeChoice('nexo')"><span class="theme-dot"></span>Verde NEXO<small>Fundo verde suave e cards em destaque</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=$('stheme')?.value==='nexo'?'nexo':'light';if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
+function settings(){const theme=normalizePremiumTheme(db.settings.theme);open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="premium-light" class="theme-option premium-light ${theme==='premium-light'?'selected':''}" onclick="setThemeChoice('premium-light')"><span class="theme-dot"></span>Claro Premium<small>Fundo claro, cards refinados e visual elegante</small></button><button type="button" data-theme="premium-dark" class="theme-option premium-dark ${theme==='premium-dark'?'selected':''}" onclick="setThemeChoice('premium-dark')"><span class="theme-dot"></span>Escuro Premium<small>Preto/grafite com vinho e verde NEXO</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=normalizePremiumTheme($('stheme')?.value);if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
 function fabAction(action){
@@ -2004,7 +2194,7 @@ function fabAction(action){
 $('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};head();home();
 </script>
 <script>
-/* NEXO 1.8.8 • PWA */
+/* NEXO 2.0 PREVIEW • PWA */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js', { updateViaCache: 'none' })
