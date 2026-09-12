@@ -304,6 +304,41 @@ body.theme-premium-light .theme-option.selected,body.theme-premium-dark .theme-o
   .nx-shortcuts{grid-template-columns:repeat(2,1fr)}.nx-next{grid-template-columns:auto 1fr}.nx-next button{grid-column:1/-1}
 }
 
+
+/* ===== NEXO 2.0.1 • CORREÇÃO FORTE CLARO/ESCURO ===== */
+html[data-nexo-theme="light"],html[data-nexo-theme="light"] body{background:#f5f3f4!important;color:#181216!important;color-scheme:light}
+html[data-nexo-theme="dark"],html[data-nexo-theme="dark"] body{background:#0e0c0d!important;color:#fffafc!important;color-scheme:dark}
+html[data-nexo-theme="dark"] body .app{background:transparent!important;color:#fffafc!important}
+html[data-nexo-theme="light"] body .app{background:transparent!important;color:#181216!important}
+html[data-nexo-theme="dark"] body .card,
+html[data-nexo-theme="dark"] body .metric,
+html[data-nexo-theme="dark"] body .sheet,
+html[data-nexo-theme="dark"] body .nx-shortcut,
+html[data-nexo-theme="dark"] body .nx-action{background:#171416!important;border-color:#31272c!important;color:#fffafc!important}
+html[data-nexo-theme="light"] body .card,
+html[data-nexo-theme="light"] body .metric,
+html[data-nexo-theme="light"] body .sheet,
+html[data-nexo-theme="light"] body .nx-shortcut,
+html[data-nexo-theme="light"] body .nx-action{background:#fff!important;border-color:#eadfe4!important;color:#181216!important}
+html[data-nexo-theme="dark"] body .nav{background:rgba(23,20,22,.96)!important;border-color:#31272c!important}
+html[data-nexo-theme="light"] body .nav{background:rgba(255,255,255,.96)!important;border-color:#eadfe4!important}
+html[data-nexo-theme="dark"] body .search,
+html[data-nexo-theme="dark"] body .field input,
+html[data-nexo-theme="dark"] body .field select,
+html[data-nexo-theme="dark"] body .field textarea{background:#211a1e!important;color:#fffafc!important;border-color:#3b3035!important}
+html[data-nexo-theme="light"] body .search,
+html[data-nexo-theme="light"] body .field input,
+html[data-nexo-theme="light"] body .field select,
+html[data-nexo-theme="light"] body .field textarea{background:#fff!important;color:#181216!important;border-color:#eadfe4!important}
+html[data-nexo-theme="dark"] body .sub,
+html[data-nexo-theme="dark"] body .small,
+html[data-nexo-theme="dark"] body .muted,
+html[data-nexo-theme="dark"] body .date{color:#b9aeb4!important}
+html[data-nexo-theme="light"] body .sub,
+html[data-nexo-theme="light"] body .small,
+html[data-nexo-theme="light"] body .muted,
+html[data-nexo-theme="light"] body .date{color:#786b72!important}
+
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -649,7 +684,7 @@ body.theme-premium-light .theme-option.selected,body.theme-premium-dark .theme-o
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.1 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1079,17 +1114,21 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.0-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.1-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
 function applyTheme(theme){
-  const chosen=normalizePremiumTheme(theme);
+  const chosen=normalizePremiumTheme(theme),dark=chosen==='premium-dark';
   document.body.classList.remove('theme-nexo','theme-premium-light','theme-premium-dark');
   document.body.classList.add(chosen);
+  document.documentElement.setAttribute('data-nexo-theme',dark?'dark':'light');
+  document.documentElement.style.backgroundColor=dark?'#0e0c0d':'#f5f3f4';
+  document.body.style.backgroundColor=dark?'#0e0c0d':'#f5f3f4';
+  document.body.style.color=dark?'#fffafc':'#181216';
   const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta)meta.setAttribute('content',chosen==='premium-dark'?'#0e0c0d':'#f5f3f4');
-  const q=$('quickThemeToggle');if(q)q.textContent=chosen==='premium-dark'?'☀':'☾';
+  if(meta)meta.setAttribute('content',dark?'#0e0c0d':'#f5f3f4');
+  const q=$('quickThemeToggle');if(q)q.textContent=dark?'☀':'☾';
 }
 function setThemeChoice(theme){
   const chosen=normalizePremiumTheme(theme);
@@ -2040,7 +2079,7 @@ function renderDeveloper(){
     const hay=[x.name,x.phone,x.category,x.city,x.note].join(' ').toLowerCase();
     return (!q||hay.includes(q))&&(!status||(x.status||'new')===status);
   });
-  $('devLeadList').innerHTML=arr.length?arr.map(x=>`<div class="dev-lead"><div class="row"><div style="min-width:0"><div class="name">${E(x.name||'Sem nome')}</div><div class="sub">${E(x.phone||'Sem telefone')}${x.category?' • '+E(x.category):''}${x.city?' • '+E(x.city):''}</div></div><span class="dev-status">${devStatusLabel(x.status||'new')}</span></div>${x.note?`<div class="sub" style="margin-top:6px">${E(x.note)}</div>`:''}<div class="actions">${x.phone?`<button class="btn primary" onclick="developerWhatsApp('${x.id}')">💬 Apresentar NEXO</button>`:''}<button class="btn ghost" onclick="developerChangeStatus('${x.id}')">Status</button><button class="btn danger" onclick="developerDeleteLead('${x.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum lead encontrado.</div>';
+  $('devLeadList').innerHTML=arr.length?arr.map(x=>`<div class="dev-lead"><div class="row"><div style="min-width:0"><div class="name">${E(x.name||'Sem nome')}</div><div class="sub">${E(x.phone||'Sem telefone')}${x.category?' • '+E(x.category):''}${x.city?' • '+E(x.city):''}</div></div><span class="dev-status">${devStatusLabel(x.status||'new')}</span></div>${x.note?`<div class="sub" style="margin-top:6px">${E(x.note)}</div>`:''}<div class="actions">${x.phone?`<button class="btn primary" onclick="developerLeadMessageMenu('${x.id}')">💬 Mensagens exemplo</button><button class="btn ghost" onclick="developerWhatsApp('${x.id}')">🚀 Apresentar NEXO</button>`:''}<button class="btn ghost" onclick="developerChangeStatus('${x.id}')">Status</button><button class="btn danger" onclick="developerDeleteLead('${x.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Nenhum lead encontrado.</div>';
 }
 
 function developerSearchLead(){
@@ -2151,10 +2190,72 @@ function developerExportCSV(){
   const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nexo_prospeccao.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
 }
-function developerWhatsApp(id){
+
+function developerLeadAudience(x){
+  const txt=[x?.category,x?.name,x?.note].join(' ');
+  return /nail|lash|unha|manicure|pedicure|sobrancelha|est[eé]tica|sal[aã]o|cabeleire|cabelo|massagem|massoterapia|podologia|depila|micropigment|spa|beleza|maquiagem|cílios|cilios/i.test(txt)?'female':'male';
+}
+function developerLeadProfile(x,audience){
+  const female=audience==='female',biz=String(x.name||'seu espaço').trim();
+  return female?{
+    icon:'✨',
+    availability:(slots)=>`Oi! ✨ Temos alguns horários disponíveis hoje na ${biz}: ${slots.join(' • ')}. Se algum funcionar para você, é só me responder com o horário que prefere.`,
+    thanks:()=>`Obrigada pela preferência! 💖 Foi um prazer receber você hoje na ${biz}. Espero que tenha gostado do atendimento. Até a próxima! ✨`,
+    birthday:()=>`Feliz aniversário! 🎉💖 A ${biz} deseja um dia lindo e muito especial para você. Muitas felicidades! ✨`,
+    reminder:(time)=>`Olá! 👋 Passando para lembrar do seu horário hoje às ${time} na ${biz}. ✨ Te esperamos!`,
+    returning:(days)=>`Oi! Tudo bem? ✨ Já fazem ${days} dias desde seu último atendimento na ${biz}. Que tal reservar seu próximo horário? Se quiser, me chama que vejo uma opção para você.`
+  }:{
+    icon:'✂️',
+    availability:(slots)=>`Fala! ✂️ Temos alguns horários disponíveis hoje na ${biz}: ${slots.join(' • ')}. Se quiser agendar, é só me responder com o horário que prefere.`,
+    thanks:()=>`Valeu pela preferência! ✂️ Foi um prazer atender você hoje na ${biz}. Até a próxima!`,
+    birthday:()=>`Feliz aniversário! 🎉🎂 A ${biz} deseja um dia especial para você. Muitas felicidades! ✂️`,
+    reminder:(time)=>`Olá! 👋 Passando para lembrar do seu horário hoje às ${time} na ${biz}. ✂️ Até daqui a pouco!`,
+    returning:(days)=>`Fala! Tudo certo? ✂️ Já fazem ${days} dias desde seu último atendimento na ${biz}. Que tal dar aquele trato no visual? Se quiser, me chama que vejo um horário para você.`
+  };
+}
+function developerLeadMessageMenu(id,audience){
+  const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
+  if(!x.phone)return alert('Este lead não possui telefone.');
+  const auto=developerLeadAudience(x),chosen=audience||auto,female=chosen==='female';
+  const slots=availableSlots(T(),5);
+  open(`<h3>💬 Mensagens exemplo</h3>
+    <div class="sub" style="margin:-3px 0 12px">Envie primeiro uma mensagem como se o NEXO já estivesse sendo usado pela <b>${E(x.name)}</b>. Depois você pode enviar a apresentação do NEXO.</div>
+    <div class="notice" style="margin-bottom:12px">Perfil ${audience?'escolhido':'detectado automaticamente'}: <b>${female?'✨ feminino / beleza':'💈 masculino / barbearia'}</b></div>
+    <div class="actions" style="margin-bottom:8px">
+      <button class="btn ${chosen==='male'?'primary':'ghost'}" onclick="developerLeadMessageMenu('${x.id}','male')">💈 Masculino</button>
+      <button class="btn ${chosen==='female'?'primary':'ghost'}" onclick="developerLeadMessageMenu('${x.id}','female')">✨ Feminino</button>
+    </div>
+    <div class="item"><div class="name">📅 Horários disponíveis</div><div class="sub">${slots.length?E(slots.join(' • ')):'Nenhum horário livre encontrado hoje.'}</div><button class="btn primary" style="width:100%;margin-top:9px" ${slots.length?'':'disabled'} onclick="developerLeadSendExample('${x.id}','availability','${chosen}')">Enviar exemplo de horários</button></div>
+    <div class="item"><div class="name">👋 Lembrete de horário</div><div class="sub">Você informa um horário e o NEXO prepara o lembrete.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="developerLeadSendExample('${x.id}','reminder','${chosen}')">Preparar lembrete</button></div>
+    <div class="item"><div class="name">💖 Agradecimento</div><div class="sub">Exemplo de mensagem enviada após o atendimento.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="developerLeadSendExample('${x.id}','thanks','${chosen}')">Preparar agradecimento</button></div>
+    <div class="item"><div class="name">🎂 Aniversário</div><div class="sub">Exemplo de mensagem de relacionamento com o cliente.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="developerLeadSendExample('${x.id}','birthday','${chosen}')">Preparar parabéns</button></div>
+    <div class="item"><div class="name">🔄 Hora de voltar</div><div class="sub">Simula a mensagem automática de retorno após alguns dias.</div><button class="btn ghost" style="width:100%;margin-top:9px" onclick="developerLeadSendExample('${x.id}','returning','${chosen}')">Preparar retorno</button></div>
+    <div class="item"><div class="name">🚀 Depois: apresentar o NEXO</div><div class="sub">Após demonstrar uma mensagem real, envie a apresentação completa do sistema.</div><button class="btn primary" style="width:100%;margin-top:9px" onclick="developerWhatsApp('${x.id}','${chosen}')">Apresentar o NEXO</button></div>
+    <button class="btn ghost" style="width:100%;margin-top:14px" onclick="closeModal()">Fechar</button>`);
+}
+function developerLeadSendExample(id,type,audience){
+  const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
+  const wp=developerLeadProfile(x,audience||developerLeadAudience(x));
+  let msg='';
+  if(type==='availability'){
+    const slots=availableSlots(T(),5);if(!slots.length)return alert('Não encontrei horários livres hoje.');
+    msg=wp.availability(slots);
+  }else if(type==='reminder'){
+    const time=prompt('Qual horário deseja usar no exemplo?','15:00');if(!time)return;
+    msg=wp.reminder(time.trim());
+  }else if(type==='thanks')msg=wp.thanks();
+  else if(type==='birthday')msg=wp.birthday();
+  else if(type==='returning'){
+    const days=prompt('Quantos dias desde o último atendimento deseja usar no exemplo?','30');if(days===null)return;
+    msg=wp.returning(String(days||30).trim());
+  }
+  x.lastSampleAt=new Date().toISOString();
+  save();renderDeveloper();closeModal();openWhatsApp(x.phone,msg);
+}
+function developerWhatsApp(id,audience){
   const x=(db.prospects||[]).find(v=>v.id===id);if(!x)return;
   const full=String(x.name||'').trim();
-  const female=/nail|lash|unha|manicure|sobrancelha|est[eé]tica|sal[aã]o|cabelo|massagem|massoterapia|podologia|depila|micropigment|spa|beleza/i.test(String(x.category||''));
+  const female=(audience||developerLeadAudience(x))==='female';
   const greeting=full?(female?`Oi, ${full}! Tudo bem? ✨`:`Fala, ${full}! Tudo certo? 👋`):(female?'Oi! Tudo bem? ✨':'Olá! Tudo certo? 👋');
   const intro=female
     ? `Essa mensagem que você acabou de receber é um exemplo de uma das mensagens que as suas próprias clientes podem receber através do NEXO.\n\nEu sou Marcelo e estou apresentando o NEXO Gestão, uma plataforma criada para facilitar a rotina de manicures, nail designers, profissionais de cabelo, sobrancelhas, cílios, estética e outros negócios da beleza.`
