@@ -430,6 +430,15 @@ html[data-nexo-theme="light"] body .date{color:#786b72!important}
     <button class="nx-shortcut" onclick="show('stock')"><span class="ico">◇</span><b>Estoque</b><small id="nxStockCount">0 itens</small></button>
   </div>
 
+  <div class="card" id="nxStockTodayCard" style="display:none">
+    <div class="row"><div><b>Movimentação de produtos hoje</b><div class="sub">Vendas e reposições registradas pelo estoque</div></div><button class="btn ghost" onclick="show('stock')">Ver estoque</button></div>
+    <hr>
+    <div class="row" style="gap:12px">
+      <div style="flex:1"><div class="small">🛍️ Produtos vendidos</div><div class="value" id="nxStockSalesValue">R$ 0,00</div><div class="sub" id="nxStockSalesQty">0 un.</div></div>
+      <div style="flex:1"><div class="small">📦 Reposição</div><div class="value" id="nxStockPurchaseValue">R$ 0,00</div><div class="sub" id="nxStockPurchaseQty">0 un.</div></div>
+    </div>
+  </div>
+
   <div class="nx-next" id="nxNextCard">
     <div class="ico">◷</div>
     <div><div class="small" style="color:inherit;opacity:.65">Próximo atendimento</div><div class="nx-next-time" id="nxNextTime">--:--</div><div class="sub" id="nxNextInfo">Nenhum agendamento pendente</div></div>
@@ -684,7 +693,7 @@ html[data-nexo-theme="light"] body .date{color:#786b72!important}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0.4 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.5 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1114,7 +1123,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.4-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.5-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
@@ -1262,7 +1271,22 @@ function renderRecommendations(){
   const items=recommendationItems();if(count)count.textContent=items.length?`${items.length} sugest${items.length===1?'ão':'ões'}`:'tudo certo';
   box.innerHTML=items.length?items.map(i=>`<div class="item"><div class="row"><div style="display:flex;gap:10px;align-items:flex-start;min-width:0"><div style="font-size:22px;line-height:1">${i.icon}</div><div><div class="name">${E(i.title)}</div><div class="sub">${E(i.sub)}</div></div></div><button class="btn ghost" style="flex:none" onclick="${i.action}">${E(i.label)}</button></div></div>`).join(''):'<div class="notice">Tudo em ordem por aqui. O NEXO não encontrou nenhuma ação importante para hoje. ✓</div>';
 }
-function home(){head();let a=db.appointments.filter(x=>x.date===T()),done=a.filter(x=>x.status==='completed'),r=done.reduce((s,x)=>s+ +x.value,0),ins=db.tx.filter(x=>x.date===T()&&x.type==='in').reduce((s,x)=>s+ +x.amount,0),outs=db.tx.filter(x=>x.date===T()&&x.type==='out').reduce((s,x)=>s+ +x.amount,0),g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));if($('nxGoalRing'))$('nxGoalRing').style.setProperty('--pct',Math.round(p));if($('nxTicket'))$('nxTicket').textContent=M(done.length?r/done.length:0);if($('nxGoalLeft'))$('nxGoalLeft').textContent=M(Math.max(0,g-r));if($('nxAgendaCount'))$('nxAgendaCount').textContent=a.length+' hoje';if($('nxClientCount'))$('nxClientCount').textContent=db.clients.length+' cadastrados';if($('nxStockCount'))$('nxStockCount').textContent=db.stock.length+' itens';if($('nxGreeting')){const nm=(currentFirebaseUser?.displayName||'').trim().split(/\s+/)[0];$('nxGreeting').textContent=nm?'Olá, '+nm+'!':'Olá!'}renderRecommendations();let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));if($('nxNextTime'))$('nxNextTime').textContent=op[0]?.time||'--:--';if($('nxNextInfo'))$('nxNextInfo').textContent=op[0]?`${op[0].client} • ${op[0].service}`:'Nenhum agendamento pendente';$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div></div><div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','reminder')">💬 Lembrar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
+function home(){head();
+let today=T(),a=db.appointments.filter(x=>x.date===today),done=a.filter(x=>x.status==='completed');
+let serviceRevenue=done.reduce((sum,x)=>sum+(+x.value||0),0);
+let todayTx=db.tx.filter(x=>x.date===today),ins=todayTx.filter(x=>x.type==='in').reduce((sum,x)=>sum+(+x.amount||0),0),outs=todayTx.filter(x=>x.type==='out').reduce((sum,x)=>sum+(+x.amount||0),0);
+let productSales=todayTx.filter(x=>x.type==='in'&&x.cat==='Venda de produtos').reduce((sum,x)=>sum+(+x.amount||0),0);
+let r=serviceRevenue+productSales,g=+db.settings.goal||0,p=g?Math.min(100,r/g*100):0;
+let todayMoves=(db.stockMoves||[]).filter(x=>x.date===today);
+let saleMoves=todayMoves.filter(x=>x.type==='out'&&x.reason==='sale'),purchaseMoves=todayMoves.filter(x=>x.type==='in'&&x.reason==='purchase');
+let soldQty=saleMoves.reduce((sum,x)=>sum+(+x.qty||0),0),soldValue=saleMoves.reduce((sum,x)=>sum+(+x.amount||0),0);
+let purchaseQty=purchaseMoves.reduce((sum,x)=>sum+(+x.qty||0),0),purchaseValue=purchaseMoves.reduce((sum,x)=>sum+(+x.amount||0),0);
+$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));if($('nxGoalRing'))$('nxGoalRing').style.setProperty('--pct',Math.round(p));if($('nxTicket'))$('nxTicket').textContent=M(done.length?serviceRevenue/done.length:0);if($('nxGoalLeft'))$('nxGoalLeft').textContent=M(Math.max(0,g-r));if($('nxAgendaCount'))$('nxAgendaCount').textContent=a.length+' hoje';if($('nxClientCount'))$('nxClientCount').textContent=db.clients.length+' cadastrados';if($('nxStockCount'))$('nxStockCount').textContent=db.stock.length+' itens';if($('nxGreeting')){const nm=(currentFirebaseUser?.displayName||'').trim().split(/\s+/)[0];$('nxGreeting').textContent=nm?'Olá, '+nm+'!':'Olá!'}if($('nxStockTodayCard'))$('nxStockTodayCard').style.display=(soldQty||purchaseQty)?'block':'none';
+if($('nxStockSalesValue'))$('nxStockSalesValue').textContent=M(soldValue);
+if($('nxStockSalesQty'))$('nxStockSalesQty').textContent=soldQty.toLocaleString('pt-BR')+' un.';
+if($('nxStockPurchaseValue'))$('nxStockPurchaseValue').textContent=M(purchaseValue);
+if($('nxStockPurchaseQty'))$('nxStockPurchaseQty').textContent=purchaseQty.toLocaleString('pt-BR')+' un.';
+renderRecommendations();let monthBills=db.bills.filter(b=>billMonth(b)===currentMonth()),total=monthBills.reduce((s,b)=>s+ +b.amount,0),paid=monthBills.filter(b=>b.paid).reduce((s,b)=>s+ +b.amount,0),left=Math.max(0,total-paid),need=left/(+db.settings.workdays||22);$('lifeTotal').textContent=M(total);$('lifeLeft').textContent=M(left);$('lifeBar').style.width=(total?paid/total*100:0)+'%';$('lifeNeed').textContent='Falta '+M(left)+' • necessidade média: '+M(need)+'/dia';let op=a.filter(x=>x.status==='scheduled').sort((x,y)=>x.time.localeCompare(y.time));if($('nxNextTime'))$('nxNextTime').textContent=op[0]?.time||'--:--';if($('nxNextInfo'))$('nxNextInfo').textContent=op[0]?`${op[0].client} • ${op[0].service}`:'Nenhum agendamento pendente';$('nextList').innerHTML=op.length?op.slice(0,4).map(x=>`<div class="item"><div class="row"><div><b>${x.time} • ${E(x.client)}</b><div class="sub">${E(x.service)} • ${M(x.value)}</div></div></div><div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','reminder')">💬 Lembrar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button></div></div>`).join(''):'<div class="empty">Nenhum atendimento pendente hoje.</div>'}
 
 function newClient(){open(`<h3>Novo cliente</h3>${f('Nome','cn')}${f('Telefone','cp','tel')}${f('Data de aniversário','cb','date')}<div class="field"><label>Observação</label><textarea id="co" rows="3"></textarea></div><div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addClient()">Salvar</button></div>`)}
 function addClient(){let n=$('cn').value.trim();if(!n)return alert('Informe o nome.');db.clients.push({id:uid(),name:n,phone:$('cp').value.trim(),birthday:$('cb').value||'',note:$('co').value.trim(),visits:0,total:0,last:''});save();closeModal();renderClients();home()}
@@ -1853,24 +1877,50 @@ function saveEditStock(id){
 function stockMove(id,type){
   let p=db.stock.find(x=>x.id===id);if(!p)return;
   open(`<h3>${type==='in'?'Entrada':'Saída'} de estoque</h3>
-    <div class="card"><div class="name">${E(p.name)}</div><div class="sub">Estoque atual: ${Number(p.qty||0).toLocaleString('pt-BR')} un.</div></div>
+    <div class="card"><div class="name">${E(p.name)}</div><div class="sub">Estoque atual: ${Number(p.qty||0).toLocaleString('pt-BR')} un. • Custo ${M(p.cost)} • Venda ${M(p.price)}</div></div>
     ${f('Quantidade','smq','number','1','min="1" step="1"')}
+    ${type==='out'?`<div class="field"><label>Motivo da saída</label><select id="smreason" onchange="updateStockMovePreview('${id}','out')"><option value="sale">Venda ao cliente</option><option value="internal">Uso interno / consumo</option><option value="adjustment">Ajuste / perda / brinde</option></select></div>
+      <div class="notice" id="smpreview">Venda: 1 un. • ${M(+p.price||0)} de receita</div>`:
+      `<div class="field"><label>Motivo da entrada</label><select id="smreason" onchange="updateStockMovePreview('${id}','in')"><option value="purchase">Compra / reposição</option><option value="adjustment">Ajuste de estoque</option></select></div>
+      <div class="field" id="smexpensewrap"><label><input id="smexpense" type="checkbox" checked> Registrar custo da reposição como despesa no Financeiro</label></div>
+      <div class="notice" id="smpreview">Reposição: 1 un. • ${M(+p.cost||0)} de custo</div>`}
     ${f('Observação','smn')}
-    ${type==='in'?`<div class="field"><label><input id="smexpense" type="checkbox"> Registrar custo desta entrada como despesa</label></div>`:''}
     <div class="actions">
       <button class="btn ghost" onclick="closeModal()">Cancelar</button>
       <button class="btn primary" onclick="saveStockMove('${id}','${type}')">Confirmar</button>
-    </div>`)
+    </div>`);
+  $('smq')?.addEventListener('input',()=>updateStockMovePreview(id,type));
+}
+function updateStockMovePreview(id,type){
+  const p=db.stock.find(x=>x.id===id);if(!p)return;
+  const qty=Math.max(1,parseInt($('smq')?.value||'1',10)),reason=$('smreason')?.value||'adjustment',box=$('smpreview');
+  if(type==='out'){
+    if(box)box.textContent=reason==='sale'?`Venda: ${qty} un. • ${M(qty*(+p.price||0))} de receita`:`Saída sem receita: ${qty} un.`;
+  }else{
+    const purchase=reason==='purchase';
+    if($('smexpensewrap'))$('smexpensewrap').style.display=purchase?'block':'none';
+    if(box)box.textContent=purchase?`Reposição: ${qty} un. • ${M(qty*(+p.cost||0))} de custo`:`Ajuste de entrada: ${qty} un.`;
+  }
 }
 function saveStockMove(id,type){
   let p=db.stock.find(x=>x.id===id),qty=Math.max(1,parseInt($('smq').value||'1',10));
   if(!p)return;
   if(type==='out'&&qty>(+p.qty||0))return alert('A saída não pode ser maior que o estoque atual.');
+  const reason=$('smreason')?.value||(type==='out'?'adjustment':'purchase');
+  const date=T(),note=$('smn').value.trim();
   p.qty=(+p.qty||0)+(type==='in'?qty:-qty);
-  db.stockMoves.push({id:uid(),stockId:id,type,qty,date:T(),note:$('smn').value.trim()});
-  if(type==='in'&&$('smexpense')?.checked&&(+p.cost||0)>0){
-    db.tx.push({id:uid(),type:'out',amount:qty*(+p.cost||0),desc:'Compra de estoque: '+p.name,date:T(),cat:'Estoque'});
+  const move={id:uid(),stockId:id,type,qty,date,note,reason};
+  if(type==='out'&&reason==='sale'){
+    const amount=qty*(+p.price||0);
+    move.unitPrice=+p.price||0;move.amount=amount;
+    if(amount>0)db.tx.push({id:uid(),type:'in',amount,desc:'Venda de estoque: '+p.name,date,cat:'Venda de produtos',stockMoveId:move.id});
   }
+  if(type==='in'&&reason==='purchase'){
+    const amount=qty*(+p.cost||0);
+    move.unitCost=+p.cost||0;move.amount=amount;
+    if($('smexpense')?.checked&&amount>0)db.tx.push({id:uid(),type:'out',amount,desc:'Compra de estoque: '+p.name,date,cat:'Estoque',stockMoveId:move.id});
+  }
+  db.stockMoves.push(move);
   save();closeModal();stock();home();
 }
 function deleteStock(id){
