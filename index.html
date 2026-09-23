@@ -684,7 +684,7 @@ html[data-nexo-theme="light"] body .date{color:#786b72!important}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0.3 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.4 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1114,7 +1114,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.3-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.4-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
@@ -1280,7 +1280,55 @@ function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente prime
 function newManualAppt(){if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Agendamento manual</h3>${f('Nome do cliente','mac')}${f('Telefone','map','tel')}<div class="field"><label>Serviço</label><select id="mas" onchange="syncManual()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','mad','date',$('agendaPicker')?.value||T())}${f('Horário','mat','time','09:00')}${f('Valor','mav','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addManualAppt()">Agendar</button></div>`)}
 function syncManual(){let s=db.services.find(x=>x.id===$('mas').value);if(s)$('mav').value=s.price}
 function addManualAppt(){let name=$('mac').value.trim(),phone=$('map').value.trim();if(!name)return alert('Informe o nome do cliente.');let s=db.services.find(x=>x.id===$('mas').value);if(!s)return alert('Selecione um serviço.');let existing=db.clients.find(c=>c.name.trim().toLowerCase()===name.toLowerCase()&&(!phone||!c.phone||c.phone===phone));let c=existing;if(!c){c={id:uid(),name,phone,birthday:'',note:'Cliente criado automaticamente por agendamento manual',visits:0,total:0,last:''};db.clients.push(c)}else if(phone&&!c.phone){c.phone=phone}let d=$('mad').value;db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('mat').value,service:s.name,value:+$('mav').value,date:d,status:'scheduled'});save();closeModal();agenda(d);renderClients();home()}
-function agenda(sel){head();let date=sel||$('agendaPicker')?.value||T();if($('agendaPicker'))$('agendaPicker').value=date;let a=db.appointments.filter(x=>x.date===date).sort((x,y)=>x.time.localeCompare(y.time));let isToday=date===T();$('agendaDate').textContent=(isToday?'Hoje':'Data')+' • '+dbr(date);$('agendaSummary').textContent=a.filter(x=>x.status==='completed').length+' concluídos';$('agendaList').innerHTML=a.length?a.map(x=>`<div class="item"><div class="row"><b>${x.time}</b><div style="flex:1"><div class="name">${E(x.client)}</div><div class="sub">${E(x.service)} • ${M(x.value)}</div></div><span class="badge ${x.status==='completed'?'green':x.status==='cancelled'?'red':'orange'}">${x.status==='completed'?'Concluído':x.status==='cancelled'?'Cancelado':'Agendado'}</span></div>${x.status==='scheduled'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','confirm')">💬 WhatsApp</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button><button class="btn danger" onclick="cancelA('${x.id}')">Cancelar</button></div>`:x.status==='completed'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','thanks')">💬 Agradecer</button></div>`:''}</div>`).join(''):'<div class="empty">Nenhum atendimento nesta data.</div>'}
+function agenda(sel){head();let date=sel||$('agendaPicker')?.value||T();if($('agendaPicker'))$('agendaPicker').value=date;let a=db.appointments.filter(x=>x.date===date).sort((x,y)=>x.time.localeCompare(y.time));let isToday=date===T();$('agendaDate').textContent=(isToday?'Hoje':'Data')+' • '+dbr(date);$('agendaSummary').textContent=a.filter(x=>x.status==='completed').length+' concluídos';$('agendaList').innerHTML=a.length?a.map(x=>`<div class="item"><div class="row"><b>${x.time}</b><div style="flex:1"><div class="name">${E(x.client)}</div><div class="sub">${E(x.service)} • ${M(x.value)}</div></div><span class="badge ${x.status==='completed'?'green':x.status==='cancelled'?'red':'orange'}">${x.status==='completed'?'Concluído':x.status==='cancelled'?'Cancelado':'Agendado'}</span></div>${x.status==='scheduled'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','confirm')">💬 WhatsApp</button><button class="btn blue" onclick="rescheduleAppointment('${x.id}')">✏️ Reagendar</button><button class="btn primary" onclick="finish('${x.id}')">Concluir</button><button class="btn danger" onclick="cancelA('${x.id}')">Cancelar</button></div>`:x.status==='completed'?`<div class="actions"><button class="btn ghost" onclick="whatsappAppointment('${x.id}','thanks')">💬 Agradecer</button></div>`:''}</div>`).join(''):'<div class="empty">Nenhum atendimento nesta data.</div>'}
+
+function appointmentConflict(date,time,duration,ignoreId=''){
+  const start=timeToMin(time),end=start+Math.max(15,+duration||+db.settings.slotInterval||30);
+  return db.appointments.find(a=>{
+    if(a.id===ignoreId||a.status==='cancelled'||a.date!==date)return false;
+    const aStart=timeToMin(a.time),aEnd=aStart+appointmentDuration(a);
+    return start<aEnd&&end>aStart;
+  })||null;
+}
+function rescheduleAppointment(id){
+  const a=db.appointments.find(x=>x.id===id);if(!a||a.status!=='scheduled')return;
+  const svc=db.services.find(x=>x.name===a.service);
+  const duration=Math.max(15,+svc?.duration||+db.settings.slotInterval||30);
+  open(`<h3>Reagendar atendimento</h3>
+    <div class="notice" style="margin-bottom:14px"><b>${E(a.client)}</b><br>${E(a.service)} • ${M(a.value)}<br><span class="sub">Atual: ${dbr(a.date)} às ${E(a.time)}</span></div>
+    ${f('Nova data','rad','date',a.date)}
+    ${f('Novo horário','rat','time',a.time)}
+    <div class="sub" style="margin-top:-4px">O NEXO verifica conflitos antes de salvar. O horário antigo será liberado automaticamente.</div>
+    <div class="actions">
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn primary" onclick="saveReschedule('${a.id}',${duration})">Salvar alteração</button>
+    </div>`);
+}
+function saveReschedule(id,duration){
+  const a=db.appointments.find(x=>x.id===id);if(!a||a.status!=='scheduled')return;
+  const newDate=$('rad')?.value,newTime=$('rat')?.value;
+  if(!newDate||!newTime)return alert('Informe a nova data e o novo horário.');
+  const openMin=timeToMin(db.settings.openTime||'09:00'),closeMin=timeToMin(db.settings.closeTime||'19:00');
+  const start=timeToMin(newTime),end=start+Math.max(15,+duration||30);
+  if(start<openMin||end>closeMin)return alert(`Esse horário fica fora do expediente configurado (${db.settings.openTime||'09:00'} às ${db.settings.closeTime||'19:00'}).`);
+  const conflict=appointmentConflict(newDate,newTime,duration,id);
+  if(conflict)return alert(`Horário indisponível. Já existe ${conflict.client||'outro atendimento'} às ${conflict.time}. Escolha outro horário.`);
+  const oldDate=a.date,oldTime=a.time;
+  if(oldDate===newDate&&oldTime===newTime)return alert('Escolha uma data ou horário diferente do atual.');
+  a.date=newDate;a.time=newTime;
+  save();closeModal();agenda(newDate);home();
+  const c=db.clients.find(x=>x.id===a.clientId);
+  open(`<div style="text-align:center;padding:6px 0 4px"><div style="font-size:38px">✓</div><h3 style="margin:5px 0">Agendamento alterado</h3>
+    <div class="sub">${E(a.client)} • ${E(a.service)}</div></div>
+    <div class="notice" style="margin-top:14px"><b>Antes:</b> ${dbr(oldDate)} às ${E(oldTime)}<br><b>Agora:</b> ${dbr(newDate)} às ${E(newTime)}</div>
+    ${c?.phone?`<div class="actions"><button class="btn ghost" onclick="closeModal()">Fechar</button><button class="btn primary" onclick="closeModal();whatsappReschedule('${a.id}','${oldDate}','${oldTime}')">💬 Avisar cliente</button></div>`:`<button class="btn primary" style="width:100%;margin-top:14px" onclick="closeModal()">Fechar</button>`}`);
+}
+function whatsappReschedule(id,oldDate,oldTime){
+  const a=db.appointments.find(x=>x.id===id);if(!a)return;
+  const c=db.clients.find(x=>x.id===a.clientId);if(!c?.phone)return alert('Este cliente não possui telefone cadastrado.');
+  const msg=`Olá, ${c.name}! 👋 Passando para confirmar que seu agendamento na ${db.settings.business} foi alterado de ${dbr(oldDate)} às ${oldTime} para ${dbr(a.date)} às ${a.time}. Se precisar de algo, é só responder por aqui.`;
+  openWhatsApp(c.phone,msg);
+}
 function finish(id){let a=db.appointments.find(x=>x.id===id);if(!a||a.status!=='scheduled')return;a.status='completed';db.tx.push({id:uid(),type:'in',amount:+a.value,desc:'Atendimento: '+a.service,date:a.date,cat:'Atendimento'});let c=db.clients.find(x=>x.id===a.clientId);if(c){c.visits=(+c.visits||0)+1;c.total=(+c.total||0)+(+a.value||0);c.last=a.date}save();agenda($('agendaPicker')?.value||a.date);home();const hasPhone=!!c?.phone;open(`<div style="text-align:center;padding:6px 0 4px"><div style="font-size:38px">✓</div><h3 style="margin:5px 0">Atendimento concluído</h3><div class="sub">${E(a.client)} • ${E(a.service)} • ${M(a.value)}</div></div>${hasPhone?`<div class="notice" style="margin-top:14px">Quer aproveitar para agradecer o cliente pelo WhatsApp?</div><div class="actions"><button class="btn ghost" onclick="closeModal()">Agora não</button><button class="btn primary" onclick="closeModal();whatsappAppointment('${a.id}','thanks')">💬 Agradecer</button></div>`:`<button class="btn primary" style="width:100%;margin-top:14px" onclick="closeModal()">Concluir</button>`}`)}function cancelA(id){if(confirm('Cancelar este atendimento?')){db.appointments.find(x=>x.id===id).status='cancelled';save();agenda($('agendaPicker')?.value||T());home()}}
 function normalizePhoneBR(phone){
   let n=String(phone||'').replace(/\D/g,'');
