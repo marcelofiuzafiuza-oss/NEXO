@@ -339,6 +339,25 @@ html[data-nexo-theme="light"] body .small,
 html[data-nexo-theme="light"] body .muted,
 html[data-nexo-theme="light"] body .date{color:#786b72!important}
 
+
+/* NEXO 2.0.7 — cor de destaque independente do modo claro/escuro */
+body.theme-premium-light,body.theme-premium-dark{--nexo-button-color:#14865a;--nexo-button-color-2:#0c6546}
+body[data-nexo-color="green"]{--nexo-button-color:#14865a;--nexo-button-color-2:#0c6546}
+body[data-nexo-color="blue"]{--nexo-button-color:#246ad2;--nexo-button-color-2:#174a9c}
+body[data-nexo-color="orange"]{--nexo-button-color:#c35c13;--nexo-button-color-2:#9b430c}
+body[data-nexo-color="pink"]{--nexo-button-color:#ad378f;--nexo-button-color-2:#87276c}
+body.theme-premium-light .btn.primary,body.theme-premium-dark .btn.primary,
+body.theme-premium-light button.primary,body.theme-premium-dark button.primary,
+body.theme-premium-light .fab,body.theme-premium-dark .fab{
+ background:linear-gradient(135deg,var(--nexo-button-color),var(--nexo-button-color-2))!important;color:white!important;
+}
+body.theme-premium-light .nav button.active,body.theme-premium-dark .nav button.active,
+body.theme-premium-light .progress div,body.theme-premium-dark .progress div{color:var(--nexo-button-color)!important}
+body.theme-premium-light .progress div,body.theme-premium-dark .progress div{background:var(--nexo-button-color)!important}
+.nexo-color-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 8px}
+.nexo-color-choice{border:2px solid transparent;border-radius:15px;background:var(--nx-surface,#fff);color:var(--nx-text,#222);padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:700;font-size:12px;cursor:pointer}
+.nexo-color-choice.selected{border-color:var(--nexo-button-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--nexo-button-color) 18%,transparent)}
+.nexo-color-swatch{height:27px;width:27px;border-radius:50%;background:var(--swatch);box-shadow:0 2px 7px #0002}
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -428,6 +447,14 @@ html[data-nexo-theme="light"] body .date{color:#786b72!important}
     <button class="nx-shortcut" onclick="show('finance')"><span class="ico">▥</span><b>Financeiro</b><small id="mResult">R$ 0,00</small></button>
     <button class="nx-shortcut" onclick="show('clients')"><span class="ico">♙</span><b>Clientes</b><small id="nxClientCount">0 cadastrados</small></button>
     <button class="nx-shortcut" onclick="show('stock')"><span class="ico">◇</span><b>Estoque</b><small id="nxStockCount">0 itens</small></button>
+  </div>
+
+  <div class="notice" id="nxLowStockAlert" style="display:none;margin-top:14px;border-radius:20px;padding:15px">
+    <div class="row" style="align-items:flex-start">
+      <div style="font-size:24px">⚠️</div>
+      <div style="flex:1"><b id="nxLowStockTitle">Estoque baixo</b><div class="sub" id="nxLowStockText" style="margin-top:4px"></div></div>
+      <button class="btn ghost" onclick="show('stock')">Repor</button>
+    </div>
   </div>
 
   <div class="card" id="nxStockTodayCard" style="display:none">
@@ -693,7 +720,7 @@ html[data-nexo-theme="light"] body .date{color:#786b72!important}
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0.5 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.7 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1123,7 +1150,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.5-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.7-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
@@ -1137,8 +1164,12 @@ function applyTheme(theme){
   document.body.style.color=dark?'#fffafc':'#181216';
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta)meta.setAttribute('content',dark?'#0e0c0d':'#f5f3f4');
+  applyNexoButtonColor($('sbuttoncolor')?.value||getNexoButtonColor());
   const q=$('quickThemeToggle');if(q)q.textContent=dark?'☀':'☾';
 }
+function getNexoButtonColor(){const color=db.settings.buttonColor;return ['green','blue','orange','pink'].includes(color)?color:(db.settings.brandTheme==='beauty'?'pink':'green')}
+function applyNexoButtonColor(color){document.body.setAttribute('data-nexo-color',['green','blue','orange','pink'].includes(color)?color:'green')}
+function setNexoButtonColorChoice(color){const el=$('sbuttoncolor');if(el)el.value=color;document.querySelectorAll('[data-nexo-color-choice]').forEach(b=>b.classList.toggle('selected',b.dataset.nexoColorChoice===color));applyNexoButtonColor(color)}
 function setThemeChoice(theme){
   const chosen=normalizePremiumTheme(theme);
   const input=$('stheme');if(input)input.value=chosen;
@@ -1281,7 +1312,15 @@ let todayMoves=(db.stockMoves||[]).filter(x=>x.date===today);
 let saleMoves=todayMoves.filter(x=>x.type==='out'&&x.reason==='sale'),purchaseMoves=todayMoves.filter(x=>x.type==='in'&&x.reason==='purchase');
 let soldQty=saleMoves.reduce((sum,x)=>sum+(+x.qty||0),0),soldValue=saleMoves.reduce((sum,x)=>sum+(+x.amount||0),0);
 let purchaseQty=purchaseMoves.reduce((sum,x)=>sum+(+x.qty||0),0),purchaseValue=purchaseMoves.reduce((sum,x)=>sum+(+x.amount||0),0);
-$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));if($('nxGoalRing'))$('nxGoalRing').style.setProperty('--pct',Math.round(p));if($('nxTicket'))$('nxTicket').textContent=M(done.length?serviceRevenue/done.length:0);if($('nxGoalLeft'))$('nxGoalLeft').textContent=M(Math.max(0,g-r));if($('nxAgendaCount'))$('nxAgendaCount').textContent=a.length+' hoje';if($('nxClientCount'))$('nxClientCount').textContent=db.clients.length+' cadastrados';if($('nxStockCount'))$('nxStockCount').textContent=db.stock.length+' itens';if($('nxGreeting')){const nm=(currentFirebaseUser?.displayName||'').trim().split(/\s+/)[0];$('nxGreeting').textContent=nm?'Olá, '+nm+'!':'Olá!'}if($('nxStockTodayCard'))$('nxStockTodayCard').style.display=(soldQty||purchaseQty)?'block':'none';
+$('rev').textContent=M(r);$('mIn').textContent=M(ins);$('mOut').textContent=M(outs);$('mResult').textContent=M(ins-outs);$('mDone').textContent=done.length;$('goalPct').textContent=Math.round(p)+'%';$('goalBar').style.width=p+'%';$('goalText').textContent=M(r)+' de '+M(g)+' • falta '+M(Math.max(0,g-r));if($('nxGoalRing'))$('nxGoalRing').style.setProperty('--pct',Math.round(p));if($('nxTicket'))$('nxTicket').textContent=M(done.length?serviceRevenue/done.length:0);if($('nxGoalLeft'))$('nxGoalLeft').textContent=M(Math.max(0,g-r));if($('nxAgendaCount'))$('nxAgendaCount').textContent=a.length+' hoje';if($('nxClientCount'))$('nxClientCount').textContent=db.clients.length+' cadastrados';if($('nxStockCount'))$('nxStockCount').textContent=db.stock.length+' itens';if($('nxGreeting')){const nm=(currentFirebaseUser?.displayName||'').trim().split(/\s+/)[0];$('nxGreeting').textContent=nm?'Olá, '+nm+'!':'Olá!'}let lowStock=(db.stock||[]).filter(x=>Number(x.qty||0)<=Number(x.min||0));
+if($('nxLowStockAlert')){
+  $('nxLowStockAlert').style.display=lowStock.length?'block':'none';
+  if(lowStock.length){
+    $('nxLowStockTitle').textContent=lowStock.length===1?'⚠️ 1 produto com estoque baixo':`⚠️ ${lowStock.length} produtos com estoque baixo`;
+    $('nxLowStockText').innerHTML=lowStock.slice(0,4).map(x=>`${E(x.name)}: <b>${Number(x.qty||0).toLocaleString('pt-BR')} un.</b> • mínimo ${Number(x.min||0).toLocaleString('pt-BR')}`).join('<br>')+(lowStock.length>4?`<br>+ ${lowStock.length-4} outro(s)`:'');
+  }
+}
+if($('nxStockTodayCard'))$('nxStockTodayCard').style.display=(soldQty||purchaseQty)?'block':'none';
 if($('nxStockSalesValue'))$('nxStockSalesValue').textContent=M(soldValue);
 if($('nxStockSalesQty'))$('nxStockSalesQty').textContent=soldQty.toLocaleString('pt-BR')+' un.';
 if($('nxStockPurchaseValue'))$('nxStockPurchaseValue').textContent=M(purchaseValue);
@@ -2379,7 +2418,7 @@ function developerChangeStatus(id){
 }
 function developerDeleteLead(id){if(!isDeveloperAccount())return;const x=(db.prospects||[]).find(v=>v.id===id);if(x&&confirm('Excluir '+x.name+' da prospecção?')){db.prospects=db.prospects.filter(v=>v.id!==id);save();renderDeveloper()}}
 
-function settings(){const theme=normalizePremiumTheme(db.settings.theme);open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="premium-light" class="theme-option premium-light ${theme==='premium-light'?'selected':''}" onclick="setThemeChoice('premium-light')"><span class="theme-dot"></span>Claro Premium<small>Fundo claro, cards refinados e visual elegante</small></button><button type="button" data-theme="premium-dark" class="theme-option premium-dark ${theme==='premium-dark'?'selected':''}" onclick="setThemeChoice('premium-dark')"><span class="theme-dot"></span>Escuro Premium<small>Preto/grafite com vinho e verde NEXO</small></button></div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=normalizePremiumTheme($('stheme')?.value);if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
+function settings(){const theme=normalizePremiumTheme(db.settings.theme);open(`<h3>Configurações</h3>${f('Nome do negócio','sb','text',db.settings.business)}${f('Meta diária','sg','number',db.settings.goal,'step="0.01" min="0"')}${f('Meta semanal','sgw','number',db.settings.weeklyGoal,'step="0.01" min="0"')}${f('Meta mensal','sgm','number',db.settings.monthlyGoal,'step="0.01" min="0"')}${f('Dias de trabalho por mês','sw','number',db.settings.workdays,'min="1" max="31"')}<hr><div class="name">Aparência</div><div class="sub" style="margin:4px 0 8px">Escolha como você prefere visualizar o NEXO.</div><input id="stheme" type="hidden" value="${theme}"><div class="theme-picker"><button type="button" data-theme="premium-light" class="theme-option premium-light ${theme==='premium-light'?'selected':''}" onclick="setThemeChoice('premium-light')"><span class="theme-dot"></span>Claro Premium<small>Fundo claro, cards refinados e visual elegante</small></button><button type="button" data-theme="premium-dark" class="theme-option premium-dark ${theme==='premium-dark'?'selected':''}" onclick="setThemeChoice('premium-dark')"><span class="theme-dot"></span>Escuro Premium<small>Preto/grafite com vinho e verde NEXO</small></button></div><div class="name" style="margin-top:18px">Cor dos botões</div><div class="sub" style="margin:4px 0 8px">Personalize os destaques sem alterar o modo claro ou escuro.</div><input type="hidden" id="sbuttoncolor" value="${getNexoButtonColor()}"><div class="nexo-color-picker">${[['green','Verde','#14865a'],['blue','Azul','#246ad2'],['orange','Laranja','#c35c13'],['pink','Rosa','#ad378f']].map(([key,label,hex])=>`<button type="button" class="nexo-color-choice ${getNexoButtonColor()===key?'selected':''}" data-nexo-color-choice="${key}" onclick="setNexoButtonColorChoice('${key}')"><span class="nexo-color-swatch" style="--swatch:${hex}"></span>${label}</button>`).join('')}</div><hr><div class="name">Agenda e WhatsApp</div><div class="sub" style="margin:4px 0 8px">Esses horários são usados para o NEXO calcular os espaços livres enviados aos clientes.</div>${f('Início do expediente','sopen','time',db.settings.openTime||'09:00')}${f('Fim do expediente','sclose','time',db.settings.closeTime||'19:00')}${f('Intervalo da grade (minutos)','sinterval','number',db.settings.slotInterval||30,'min="15" step="5"')}<hr><div class="name">Perfil do negócio</div><div class="sub" style="margin:4px 0 8px">${db.settings.segment==='beauty'?'Beleza / Estética':'Barbearia'} • personalize atividades, serviços sugeridos e identidade.</div><button type="button" class="btn ghost" style="width:100%;margin-bottom:10px" onclick="closeModal();reopenBusinessSetup()">Reconfigurar perfil do NEXO</button><div class="actions"><button class="btn ghost" onclick="applyTheme(db.settings.theme);applyNexoButtonColor(getNexoButtonColor());closeModal()">Cancelar</button><button class="btn primary" onclick="saveSettings()">Salvar</button></div>`)}function saveSettings(){db.settings.business=$('sb').value.trim();db.settings.goal=+$('sg').value;db.settings.weeklyGoal=+$('sgw').value||0;db.settings.monthlyGoal=+$('sgm').value||0;db.settings.workdays=+$('sw').value||22;db.settings.openTime=$('sopen').value||'09:00';db.settings.closeTime=$('sclose').value||'19:00';db.settings.slotInterval=Math.max(15,+$('sinterval').value||30);db.settings.theme=normalizePremiumTheme($('stheme')?.value);db.settings.buttonColor=$('sbuttoncolor')?.value||getNexoButtonColor();if(timeToMin(db.settings.closeTime)<=timeToMin(db.settings.openTime))return alert('O fim do expediente precisa ser depois do início.');applyTheme(db.settings.theme);applyBrandTheme();applyNexoButtonColor(getNexoButtonColor());save();closeModal();head();home();life();if($('goals').classList.contains('active'))goals()}
 function fab(){let m=$('fabMenu');m.classList.toggle('show')}
 function closeFab(){let m=$('fabMenu');if(m)m.classList.remove('show')}
 function fabAction(action){
