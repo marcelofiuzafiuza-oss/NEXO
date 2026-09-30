@@ -378,6 +378,21 @@ body[data-nexo-color] .nav button.active b{color:var(--nexo-button-color)!import
 body[data-nexo-color] .progress div{background:var(--nexo-button-color)!important}
 body[data-nexo-color] .theme-option.selected{border-color:var(--nexo-button-color)!important}
 body[data-nexo-color] .nexo-color-choice.selected{border-color:var(--nexo-button-color)!important}
+
+/* NEXO 2.0.9 • contraste consistente no modo escuro */
+html[data-nexo-theme="dark"] .btn.ghost,
+body.dark .btn.ghost{
+  background:#24252b !important;
+  color:#f7f7f8 !important;
+  border-color:#4b4d55 !important;
+}
+html[data-nexo-theme="dark"] .btn.ghost *,
+body.dark .btn.ghost *{color:#f7f7f8 !important}
+html[data-nexo-theme="dark"] .item .btn:not(.primary):not(.danger):not(.blue),
+body.dark .item .btn:not(.primary):not(.danger):not(.blue){
+  color:#f7f7f8 !important;
+}
+
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -740,7 +755,7 @@ body[data-nexo-color] .nexo-color-choice.selected{border-color:var(--nexo-button
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0.8 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.9 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1088,6 +1103,31 @@ const setupActivityMap={
  facial:{label:'Estética facial',icon:'🧴',services:['Limpeza de pele']},
  other:{label:'Outro',icon:'➕',services:[]}
 };
+
+function serviceNamesForCurrentProfile(){
+  const segment=db.settings.segment||'barber';
+  const acts=(db.settings.activities&&db.settings.activities.length)?db.settings.activities:(segment==='barber'?['barber']:[]);
+  const allowed=new Set();
+  if(segment==='barber'){
+    (setupActivityMap.barber.services||[]).forEach(x=>allowed.add(normalizeClientSearch(x)));
+  }else{
+    acts.filter(k=>k!=='barber').forEach(k=>(setupActivityMap[k]?.services||[]).forEach(x=>allowed.add(normalizeClientSearch(x))));
+  }
+  return allowed;
+}
+function servicesForAppointment(){
+  const allowed=serviceNamesForCurrentProfile();
+  const segment=db.settings.segment||'barber';
+  return (db.services||[]).filter(s=>{
+    const n=normalizeClientSearch(s.name);
+    if(allowed.has(n))return true;
+    /* Custom services are kept only when they are not a known service from the opposite profile. */
+    const barberKnown=new Set((setupActivityMap.barber.services||[]).map(normalizeClientSearch));
+    const beautyKnown=new Set(Object.entries(setupActivityMap).filter(([k])=>k!=='barber').flatMap(([,v])=>v.services||[]).map(normalizeClientSearch));
+    return segment==='barber'?!beautyKnown.has(n):!barberKnown.has(n);
+  });
+}
+
 function setupSelectedActivities(){return setupState.activities.map(k=>setupActivityMap[k]).filter(Boolean)}
 function setupSuggestedServices(){return [...new Set(setupSelectedActivities().flatMap(x=>x.services))]}
 function setupOpen(){setupState.business=db.settings.business==='Minha Barbearia'?'':(db.settings.business||'');$('businessSetup').classList.add('show');document.body.classList.add('locked-scroll');renderSetup()}
@@ -1111,9 +1151,20 @@ function renderSetup(){
  $('setupBody').innerHTML=body;
  $('setupActions').innerHTML=`${step>0?'<button class="btn ghost" onclick="setupBack()">Voltar</button>':''}<button class="btn primary" onclick="setupNext()">${step===6?'Começar a usar o NEXO':'Próximo →'}</button>`;
 }
-function applyBrandTheme(){document.body.classList.remove('theme-beauty','theme-neutral','theme-darkbrand');const t=db.settings.brandTheme||'barber';if(t==='beauty')document.body.classList.add('theme-beauty');if(t==='neutral')document.body.classList.add('theme-neutral');if(t==='dark')document.body.classList.add('theme-darkbrand');const tag=document.querySelector('.splash-tag'),sub=document.querySelector('.auth-sub');const label=db.settings.segment==='beauty'?'Gestão para Profissionais da Beleza':'Gestão para Barbeiros';if(tag)tag.textContent=label;if(sub)sub.textContent=label}
+function applyBrandTheme(){
+  /* 2.0.9: segmento define conteúdo; cor é controlada exclusivamente pelo accentColor */
+  document.body.classList.remove('theme-beauty','theme-neutral','theme-darkbrand');
+  const tag=document.querySelector('.splash-tag'),sub=document.querySelector('.auth-sub');
+  const label=db.settings.segment==='beauty'?'Gestão para Profissionais da Beleza':'Gestão para Barbeiros';
+  if(tag)tag.textContent=label;if(sub)sub.textContent=label;
+  if(typeof applyAccentColor==='function')applyAccentColor(db.settings.accentColor||'green');
+}
 async function finishBusinessSetup(){
  db.settings.segment=setupState.segment;db.settings.activities=[...setupState.activities];db.settings.business=setupState.business||db.settings.business;db.settings.openTime=setupState.openTime;db.settings.closeTime=setupState.closeTime;db.settings.brandTheme=setupState.brandTheme;db.settings.onboardingV2Done=true;
+ /* Remove somente serviços-padrão incompatíveis; serviços personalizados do usuário são preservados. */
+ const barberBuiltin=new Set((setupActivityMap.barber.services||[]).map(normalizeClientSearch));
+ const beautyBuiltin=new Set(Object.entries(setupActivityMap).filter(([k])=>k!=='barber').flatMap(([,v])=>v.services||[]).map(normalizeClientSearch));
+ db.services=(db.services||[]).filter(s=>setupState.segment==='barber'?!beautyBuiltin.has(normalizeClientSearch(s.name)):!barberBuiltin.has(normalizeClientSearch(s.name)));
  const existing=new Set(db.services.map(s=>String(s.name||'').toLowerCase()));setupState.services.forEach(name=>{if(!existing.has(name.toLowerCase()))db.services.push({id:uid(),name,price:0,duration:30,returnDays:30})});
  persistLocal();
  applyBrandTheme();head();home();setupClose();
@@ -1170,7 +1221,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.8-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.9-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
@@ -1359,7 +1410,7 @@ function addService(){let n=$('sn').value.trim(),p=+$('sp').value,d=+$('sd').val
 function renderServices(){$('serviceList').innerHTML=db.services.length?db.services.map(s=>`<div class="item"><div class="row"><div><div class="name">${E(s.name)}</div><div class="sub">${s.duration} minutos${+(s.returnDays||0)>0?' • retorno em '+s.returnDays+' dias':''}</div></div><b>${M(s.price)}</b></div><div class="actions"><button class="btn blue" onclick="editService('${s.id}')">Editar</button><button class="btn danger" onclick="delService('${s.id}')">Excluir</button></div></div>`).join(''):'<div class="empty">Cadastre seus serviços.</div>'}
 function editService(id){let s=db.services.find(x=>x.id===id);open(`<h3>Editar serviço</h3>${f('Nome','un','text',s.name)}${f('Preço','up','number',s.price,'step="0.01" min="0"')}${f('Duração','ud','number',s.duration,'min="1"')}${f('Retorno recomendado (dias)','ur','number',s.returnDays??20,'min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="updateService('${id}')">Salvar</button></div>`)}function updateService(id){let s=db.services.find(x=>x.id===id);s.name=$('un').value.trim();s.price=+$('up').value;s.duration=+$('ud').value;s.returnDays=Math.max(0,+$('ur').value||0);save();closeModal();renderServices();home()}function delService(id){let s=db.services.find(x=>x.id===id);if(confirm('Excluir '+s.name+'?')){db.services=db.services.filter(x=>x.id!==id);save();renderServices();home()}}
 function filterAppointmentClients(){const inp=$('appointmentClientSearch'),sel=$('ac');if(!inp||!sel)return;const q=normalizeClientSearch(inp.value),qd=String(inp.value||'').replace(/\D/g,'');let first=null;Array.from(sel.options).forEach(o=>{const c=db.clients.find(x=>x.id===o.value);if(!c){o.hidden=false;return}const ok=!q||normalizeClientSearch(c.name).includes(q)||(qd&&String(c.phone||'').replace(/\D/g,'').includes(qd));o.hidden=!ok;if(ok&&!first)first=o});if(first&&sel.selectedOptions[0]?.hidden){sel.value=first.value;sel.dispatchEvent(new Event('change'))}}
-function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente primeiro.');if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Novo atendimento</h3><div class="field"><label>Cliente</label><input id="appointmentClientSearch" placeholder="🔎 Buscar cliente por nome ou telefone..." autocomplete="off" inputmode="search" oninput="filterAppointmentClients()" style="margin-bottom:8px"><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div><div class="field"><label>Serviço</label><select id="as" onchange="sync()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','ad','date',$('agendaPicker')?.value||T())}${f('Horário','at','time','09:00')}${f('Valor','av','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addAppt()">Agendar</button></div>`)}function sync(){let s=db.services.find(x=>x.id===$('as').value);$('av').value=s.price}function addAppt(){let c=db.clients.find(x=>x.id===$('ac').value),s=db.services.find(x=>x.id===$('as').value);db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('at').value,service:s.name,value:+$('av').value,date:$('ad').value,status:'scheduled'});save();closeModal();agenda($('ad')?.value||$('agendaPicker')?.value||T());home()}
+function newAppt(){if(!db.clients.length)return alert('Cadastre um cliente primeiro.');if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Novo atendimento</h3><div class="field"><label>Cliente</label><input id="appointmentClientSearch" placeholder="🔎 Buscar cliente por nome ou telefone..." autocomplete="off" inputmode="search" oninput="filterAppointmentClients()" style="margin-bottom:8px"><select id="ac">${db.clients.map(c=>`<option value="${c.id}">${E(c.name)}</option>`).join('')}</select></div><div class="field"><label>Serviço</label><select id="as" onchange="sync()">${servicesForAppointment().map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','ad','date',$('agendaPicker')?.value||T())}${f('Horário','at','time','09:00')}${f('Valor','av','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addAppt()">Agendar</button></div>`)}function sync(){let s=db.services.find(x=>x.id===$('as').value);$('av').value=s.price}function addAppt(){let c=db.clients.find(x=>x.id===$('ac').value),s=db.services.find(x=>x.id===$('as').value);db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('at').value,service:s.name,value:+$('av').value,date:$('ad').value,status:'scheduled'});save();closeModal();agenda($('ad')?.value||$('agendaPicker')?.value||T());home()}
 function newManualAppt(){if(!db.services.length)return alert('Cadastre um serviço primeiro.');open(`<h3>Agendamento manual</h3>${f('Nome do cliente','mac')}${f('Telefone','map','tel')}<div class="field"><label>Serviço</label><select id="mas" onchange="syncManual()">${db.services.map(s=>`<option value="${s.id}">${E(s.name)} — ${M(s.price)}</option>`).join('')}</select></div>${f('Data','mad','date',$('agendaPicker')?.value||T())}${f('Horário','mat','time','09:00')}${f('Valor','mav','number',db.services[0].price,'step="0.01" min="0"')}<div class="actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn primary" onclick="addManualAppt()">Agendar</button></div>`)}
 function syncManual(){let s=db.services.find(x=>x.id===$('mas').value);if(s)$('mav').value=s.price}
 function addManualAppt(){let name=$('mac').value.trim(),phone=$('map').value.trim();if(!name)return alert('Informe o nome do cliente.');let s=db.services.find(x=>x.id===$('mas').value);if(!s)return alert('Selecione um serviço.');let existing=db.clients.find(c=>c.name.trim().toLowerCase()===name.toLowerCase()&&(!phone||!c.phone||c.phone===phone));let c=existing;if(!c){c={id:uid(),name,phone,birthday:'',note:'Cliente criado automaticamente por agendamento manual',visits:0,total:0,last:''};db.clients.push(c)}else if(phone&&!c.phone){c.phone=phone}let d=$('mad').value;db.appointments.push({id:uid(),clientId:c.id,client:c.name,time:$('mat').value,service:s.name,value:+$('mav').value,date:d,status:'scheduled'});save();closeModal();agenda(d);renderClients();home()}
