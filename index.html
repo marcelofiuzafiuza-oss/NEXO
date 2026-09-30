@@ -340,7 +340,7 @@ html[data-nexo-theme="light"] body .muted,
 html[data-nexo-theme="light"] body .date{color:#786b72!important}
 
 
-/* NEXO 2.0.7 — cor de destaque independente do modo claro/escuro */
+/* NEXO 2.0.8 — cor de destaque independente do modo claro/escuro */
 body.theme-premium-light,body.theme-premium-dark{--nexo-button-color:#14865a;--nexo-button-color-2:#0c6546}
 body[data-nexo-color="green"]{--nexo-button-color:#14865a;--nexo-button-color-2:#0c6546}
 body[data-nexo-color="blue"]{--nexo-button-color:#246ad2;--nexo-button-color-2:#174a9c}
@@ -358,6 +358,26 @@ body.theme-premium-light .progress div,body.theme-premium-dark .progress div{bac
 .nexo-color-choice{border:2px solid transparent;border-radius:15px;background:var(--nx-surface,#fff);color:var(--nx-text,#222);padding:10px 3px;display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:700;font-size:12px;cursor:pointer}
 .nexo-color-choice.selected{border-color:var(--nexo-button-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--nexo-button-color) 18%,transparent)}
 .nexo-color-swatch{height:27px;width:27px;border-radius:50%;background:var(--swatch);box-shadow:0 2px 7px #0002}
+
+/* NEXO 2.0.8: a cor selecionada prevalece sobre a identidade Beauty. */
+body[data-nexo-color="green"]{--nx-accent:#14865a;--nx-accent-2:#0c6546;--nexo-button-color:#14865a;--nexo-button-color-2:#0c6546}
+body[data-nexo-color="blue"]{--nx-accent:#246ad2;--nx-accent-2:#174a9c;--nexo-button-color:#246ad2;--nexo-button-color-2:#174a9c}
+body[data-nexo-color="orange"]{--nx-accent:#c35c13;--nx-accent-2:#9b430c;--nexo-button-color:#c35c13;--nexo-button-color-2:#9b430c}
+body[data-nexo-color="pink"]{--nx-accent:#ad378f;--nx-accent-2:#87276c;--nexo-button-color:#ad378f;--nexo-button-color-2:#87276c}
+body[data-nexo-color] .logo.nexo-wordmark,
+body[data-nexo-color] header .nexo-wordmark,
+body[data-nexo-color] .auth-logo.nexo-wordmark{color:var(--nexo-button-color)!important}
+body[data-nexo-color] .nexo-wordmark .nexo-scissor,
+body[data-nexo-color] .nexo-wordmark .nexo-o{color:#14865a!important}
+body[data-nexo-color] .btn.primary,
+body[data-nexo-color] button.primary,
+body[data-nexo-color] .fab,
+body[data-nexo-color] .nx-next button{background:linear-gradient(135deg,var(--nexo-button-color),var(--nexo-button-color-2))!important;color:#fff!important}
+body[data-nexo-color] .nav button.active,
+body[data-nexo-color] .nav button.active b{color:var(--nexo-button-color)!important}
+body[data-nexo-color] .progress div{background:var(--nexo-button-color)!important}
+body[data-nexo-color] .theme-option.selected{border-color:var(--nexo-button-color)!important}
+body[data-nexo-color] .nexo-color-choice.selected{border-color:var(--nexo-button-color)!important}
 </style></head><body>
 <div class="splash" id="splash">
   <div class="splash-core">
@@ -720,7 +740,7 @@ body.theme-premium-light .progress div,body.theme-premium-dark .progress div{bac
     <button class="btn primary" onclick="contactNexoSupport()">WhatsApp</button>
   </div>
 </div>
-<div class="card"><b>NEXO 2.0.7 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
+<div class="card"><b>NEXO 2.0.8 PREVIEW</b><div class="sub">Dados isolados por conta • suporte NEXO • Barber + Beauty</div></div></section>
 <div class="fabmenu" id="fabMenu">
 <button onclick="fabAction('in')">Receita</button>
 <button onclick="fabAction('out')">Despesa</button>
@@ -1150,7 +1170,7 @@ async function bootNexo(){
 }
 window.addEventListener('load',bootNexo);
 
-const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.7-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const K_BASE='NEXO13',NEXO_APP_VERSION='2.0.8-preview',uid=()=>crypto.randomUUID(),M=v=>(Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),T=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},$=id=>document.getElementById(id),E=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function normalizePremiumTheme(theme){
   return theme==='premium-dark'||theme==='dark'?'premium-dark':'premium-light';
 }
